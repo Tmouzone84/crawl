@@ -808,23 +808,9 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Route panel overlay for tap-to-close */
+        /* Route panel overlay - disabled, using close button instead */
         .route-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .route-overlay.visible {
-            display: block;
-            opacity: 1;
+            display: none !important;
         }
 
         /* Pull handle for mobile */
