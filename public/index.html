@@ -1272,13 +1272,20 @@
         @media (max-width: 1024px) {
             .container {
                 grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
             }
             .sidebar {
                 border-right: none;
                 border-bottom: 1px solid var(--border-subtle);
+                max-height: none;
+                overflow-y: visible;
+                padding-bottom: 100px;
+                -webkit-overflow-scrolling: touch;
             }
             .map-container {
-                height: 60vh;
+                height: 50vh;
+                min-height: 300px;
             }
             .route-panel {
                 position: fixed;
@@ -1287,8 +1294,26 @@
                 left: 0;
                 right: 0;
                 width: 100%;
-                max-height: 60vh;
+                max-height: 70vh;
                 border-radius: 24px 24px 0 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .theme-toggle {
+                top: 16px;
+                right: 16px;
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            .vibe-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .vibe-card {
+                padding: 16px 12px;
+            }
+            .vibe-name {
+                font-size: 12px;
             }
         }
 
