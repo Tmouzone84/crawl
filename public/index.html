@@ -760,6 +760,17 @@
             color: var(--accent-gold);
         }
 
+        .route-action-btn.new-crawl-btn {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border: none;
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+
+        .route-action-btn.new-crawl-btn:hover {
+            box-shadow: 0 4px 12px rgba(201, 169, 98, 0.4);
+        }
+
         .route-stats {
             display: flex;
             gap: 16px;
@@ -1751,6 +1762,7 @@
                     <div class="route-header-top">
                         <h2>Your Crawl</h2>
                         <div class="route-actions-top">
+                            <button class="route-action-btn new-crawl-btn" id="newCrawlBtn">New</button>
                             <button class="route-action-btn" id="saveCrawlBtn">Save</button>
                             <button class="route-action-btn" id="shareCrawlBtn">Share</button>
                             <button class="route-action-btn" id="printCrawlBtn">Print</button>
@@ -2733,6 +2745,34 @@
         const printCrawlBtn = document.getElementById('printCrawlBtn');
         printCrawlBtn.addEventListener('click', () => {
             window.print();
+        });
+
+        // New Crawl - reset and start fresh
+        const newCrawlBtn = document.getElementById('newCrawlBtn');
+        newCrawlBtn.addEventListener('click', () => {
+            // Hide the route panel
+            routePanel.classList.remove('visible');
+
+            // Clear selections
+            vibeCards.forEach(c => c.classList.remove('selected'));
+            selectedVibe = null;
+            selectedSubOptions = [];
+            subOptions.classList.remove('visible');
+            generateBtn.disabled = true;
+
+            // Clear markers and route from map
+            markers.forEach(m => m.remove());
+            markers = [];
+            if (map.getSource('route')) {
+                map.removeLayer('route');
+                map.removeSource('route');
+            }
+
+            // Reset current crawl data
+            currentCrawl = null;
+
+            // Scroll to top on mobile
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
         // PWA
