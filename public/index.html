@@ -2222,9 +2222,13 @@
             generateBtn.addEventListener('click', generateCrawl);
             locationInput.addEventListener('input', checkGenerateButton);
 
-            // Update app title based on location
+            // Update app title based on location and clear cached GPS
             const appTitle = document.getElementById('appTitle');
             locationInput.addEventListener('input', () => {
+                // Clear cached GPS location when user types
+                userLocation = null;
+                useLocationBtn.textContent = 'GPS';
+
                 const location = locationInput.value.trim();
                 if (location) {
                     // Extract city/area name (first part before comma or full text)
