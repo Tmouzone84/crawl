@@ -550,6 +550,76 @@
             animation: expandIn 0.3s ease;
         }
 
+        /* Day picker */
+        .day-picker-section {
+            padding-bottom: 16px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .day-picker-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .day-picker {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .day-btn {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-btn:first-child {
+            padding: 0 14px;
+            min-width: auto;
+        }
+
+        .day-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
+        .day-btn.selected {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border-color: var(--accent-gold);
+            color: var(--bg-primary);
+        }
+
+        .day-btn.today-indicator {
+            position: relative;
+        }
+
+        .day-btn.today-indicator::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+        }
+
+        .day-btn.selected.today-indicator::after {
+            background: var(--bg-primary);
+        }
+
         /* Toggle switches */
         .toggle-row {
             display: flex;
@@ -1827,6 +1897,20 @@
                     <span class="optional-toggle" id="optionalToggle">▼</span>
                 </div>
                 <div class="optional-content" id="optionalContent">
+                    <div class="day-picker-section">
+                        <span class="day-picker-label">When are you going?</span>
+                        <div class="day-picker" id="dayPicker">
+                            <button class="day-btn selected" data-day="today">Today</button>
+                            <button class="day-btn" data-day="0">S</button>
+                            <button class="day-btn" data-day="1">M</button>
+                            <button class="day-btn" data-day="2">T</button>
+                            <button class="day-btn" data-day="3">W</button>
+                            <button class="day-btn" data-day="4">T</button>
+                            <button class="day-btn" data-day="5">F</button>
+                            <button class="day-btn" data-day="6">S</button>
+                        </div>
+                    </div>
+
                     <div class="toggle-row">
                         <span class="toggle-label">Budget-friendly</span>
                         <div class="toggle-switch" id="toggleBudget"></div>
@@ -2082,6 +2166,7 @@
         let prefLateNight = false;
         let prefLiveMusic = false;
         let prefOpenNow = false;
+        let selectedDay = 'today'; // 'today' or 0-6 (Sunday-Saturday)
 
         // DOM Elements
         const mapboxTokenInput = document.getElementById('mapboxToken');
@@ -2140,6 +2225,7 @@
             setupSliders();
             setupLocationButton();
             setupToggles();
+            setupDayPicker();
             setupPWA();
 
             // Hardcoded Mapbox token
@@ -2239,6 +2325,30 @@
             document.getElementById('toggleOpenNow').addEventListener('click', function() {
                 this.classList.toggle('active');
                 prefOpenNow = this.classList.contains('active');
+            });
+        }
+
+        // Day picker
+        function setupDayPicker() {
+            const dayPicker = document.getElementById('dayPicker');
+            const dayBtns = dayPicker.querySelectorAll('.day-btn');
+            const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+
+            // Mark today's day with an indicator
+            dayBtns.forEach(btn => {
+                const day = btn.dataset.day;
+                if (day !== 'today' && parseInt(day) === today) {
+                    btn.classList.add('today-indicator');
+                }
+            });
+
+            // Handle day selection
+            dayBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dayBtns.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedDay = btn.dataset.day;
+                });
             });
         }
 
@@ -2395,6 +2505,18 @@
 
             // Add preference keywords
             if (prefLiveMusic) keywords.push('live music entertainment');
+
+            // Add day context for relevant vibes
+            const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const targetDay = selectedDay === 'today' ? new Date().getDay() : parseInt(selectedDay);
+            const dayName = dayNames[targetDay];
+            const isWeekend = targetDay === 5 || targetDay === 6 || targetDay === 0; // Fri, Sat, Sun
+
+            if (selectedVibe === 'brunch') {
+                keywords.push(isWeekend ? 'weekend brunch' : 'weekday brunch');
+            } else if (selectedVibe === 'ladies') {
+                keywords.push(`${dayName} ladies night`);
+            }
 
             return keywords.slice(0, 4).join(' ');
         }
