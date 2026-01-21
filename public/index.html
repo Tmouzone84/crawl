@@ -1,0 +1,2653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Crawl | Nightlife & Bar Crawl Planner</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Crawl">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Mapbox GL JS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #22222e;
+            --accent-gold: #c9a962;
+            --accent-gold-light: #e4d4a4;
+            --accent-gold-dark: #8b7355;
+            --accent-rose: #d4848c;
+            --accent-teal: #5eb3a7;
+            --accent-purple: #9b7dd4;
+            --text-primary: #fafafa;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --border-subtle: rgba(201, 169, 98, 0.15);
+            --border-glow: rgba(201, 169, 98, 0.3);
+            --success: #5eb3a7;
+            --glass: rgba(26, 26, 36, 0.8);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f0f2;
+            --accent-gold: #a88a3d;
+            --accent-gold-light: #c9a962;
+            --accent-gold-dark: #7a6432;
+            --text-primary: #1a1a1f;
+            --text-secondary: #4a4a55;
+            --text-muted: #8a8a95;
+            --border-subtle: rgba(0, 0, 0, 0.1);
+            --border-glow: rgba(168, 138, 61, 0.3);
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+        }
+
+        /* Animated gradient background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(201, 169, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(94, 179, 167, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(212, 132, 140, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Noise texture */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-right: 1px solid var(--border-subtle);
+            padding: 32px;
+            overflow-y: auto;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-gold) 0%, transparent 50%, var(--accent-gold) 100%);
+            opacity: 0.3;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 20px rgba(201, 169, 98, 0.3);
+        }
+
+        .logo-text h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text .tagline {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Section styling */
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Location Input */
+        .preference-group {
+            margin-bottom: 24px;
+        }
+
+        .preference-group label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 500;
+        }
+
+        .location-input-wrapper {
+            position: relative;
+        }
+
+        .location-input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px 20px;
+            padding-left: 48px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .location-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+        }
+
+        .location-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .location-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-gold);
+            font-size: 16px;
+        }
+
+        .use-location-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .use-location-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* Vibe Cards */
+        .vibe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .vibe-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vibe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .vibe-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-gold-dark);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .vibe-card.selected {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 24px rgba(201, 169, 98, 0.3);
+        }
+
+        .vibe-card.selected::before {
+            opacity: 1;
+        }
+
+        .vibe-card.selected .vibe-name {
+            position: relative;
+            z-index: 1;
+            color: var(--bg-primary);
+        }
+
+        .vibe-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        /* Sub-options that appear based on vibe */
+        .sub-options {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-subtle);
+            display: none;
+            animation: expandIn 0.3s ease;
+        }
+
+        .sub-options.visible {
+            display: block;
+        }
+
+        @keyframes expandIn {
+            from { opacity: 0; transform: scaleY(0.9); }
+            to { opacity: 1; transform: scaleY(1); }
+        }
+
+        .sub-options-title {
+            font-size: 13px;
+            color: var(--accent-gold);
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        /* Chips */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .chip:hover {
+            border-color: var(--accent-gold-dark);
+            color: var(--text-primary);
+        }
+
+        .chip.selected {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border-color: transparent;
+            color: var(--bg-primary);
+            font-weight: 500;
+        }
+
+        /* Optional Preferences */
+        .optional-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .optional-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 0;
+            transition: margin 0.3s ease;
+        }
+
+        .optional-header.expanded {
+            margin-bottom: 16px;
+        }
+
+        .optional-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .optional-toggle {
+            color: var(--accent-gold);
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .optional-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .optional-content {
+            display: none;
+        }
+
+        .optional-content.visible {
+            display: block;
+            animation: expandIn 0.3s ease;
+        }
+
+        /* Toggle switches */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label .emoji {
+            font-size: 16px;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+            background: var(--bg-primary);
+        }
+
+        /* Slider */
+        .slider-row {
+            margin-top: 16px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .slider-value {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-primary);
+            border-radius: 3px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(201, 169, 98, 0.4);
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border: none;
+            border-radius: 14px;
+            padding: 18px 24px;
+            color: var(--bg-primary);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 24px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            box-shadow: 0 4px 24px rgba(201, 169, 98, 0.3);
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .generate-btn:hover::before {
+            left: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(201, 169, 98, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Map Container */
+        .map-container {
+            position: relative;
+            height: 100vh;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Route Panel */
+        .route-panel {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 380px;
+            max-height: calc(100vh - 48px);
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            border-radius: 24px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            display: none;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+        }
+
+        .route-panel.visible {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .route-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: linear-gradient(180deg, rgba(201, 169, 98, 0.1) 0%, transparent 100%);
+        }
+
+        .route-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .route-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .route-actions-top {
+            display: flex;
+            gap: 8px;
+        }
+
+        .route-action-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .route-action-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
+        .route-action-btn.saved {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .route-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .route-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .route-stops {
+            padding: 16px 24px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .route-stop {
+            display: flex;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .route-stop:last-child {
+            border-bottom: none;
+        }
+
+        .stop-number {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--bg-primary);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .stop-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stop-name-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .stop-name-link:hover .stop-name {
+            color: var(--accent-gold);
+        }
+
+        .stop-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+            transition: color 0.2s;
+        }
+
+        .stop-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .stop-rating {
+            color: var(--accent-gold);
+        }
+
+        .stop-address {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stop-walk {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: 48px;
+            border-bottom: 1px dashed var(--border-subtle);
+            margin-bottom: 4px;
+        }
+
+        .stop-walk-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ride-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .ride-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-family: 'Outfit', sans-serif;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .ride-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
+        .ride-btn.uber:hover {
+            border-color: #000;
+            background: #000;
+            color: #fff;
+        }
+
+        .ride-btn.careem:hover {
+            border-color: #4caf50;
+            color: #4caf50;
+        }
+
+        /* Venue badges */
+        .venue-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .venue-badge {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .venue-badge.open-now {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .venue-badge.price {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .venue-badge.ladies-night {
+            border-color: var(--accent-rose);
+            color: var(--accent-rose);
+        }
+
+        /* Suggested time */
+        .stop-time-suggestion {
+            font-size: 10px;
+            color: var(--accent-gold);
+            margin-top: 4px;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 5000;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.visible {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* Share modal */
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal.visible {
+            display: flex;
+        }
+
+        .share-modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 28px;
+            width: 90%;
+            max-width: 360px;
+        }
+
+        .share-modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .share-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .share-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .share-option:hover {
+            border-color: var(--accent-gold);
+        }
+
+        .share-modal-close {
+            margin-top: 16px;
+            width: 100%;
+            background: none;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .share-modal-close:hover {
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+        }
+
+        /* Saved crawls section */
+        .saved-crawls-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+            display: none;
+        }
+
+        .saved-crawls-section.visible {
+            display: block;
+        }
+
+        .saved-crawls-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .saved-crawl-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .saved-crawl-item:hover {
+            border-color: var(--accent-gold);
+        }
+
+        .saved-crawl-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .saved-crawl-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .sidebar, .map-container, .theme-toggle, .route-actions-top,
+            .booking-modal-overlay, .share-modal, .toast, .install-banner,
+            .loading-overlay, .error-toast, .action-btn, .ride-buttons {
+                display: none !important;
+            }
+            .route-panel {
+                position: static !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: none !important;
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .route-panel.visible {
+                display: block !important;
+            }
+            .route-stop {
+                border-bottom: 1px solid #ddd !important;
+            }
+            .stop-name, .stop-address, .stop-meta {
+                color: black !important;
+            }
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loader {
+            width: 56px;
+            height: 56px;
+            border: 2px solid var(--border-subtle);
+            border-top-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* Error Toast */
+        .error-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-rose);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 3000;
+            display: none;
+        }
+
+        .error-toast.visible {
+            display: block;
+        }
+
+        /* Map Markers */
+        .marker {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--bg-primary);
+            font-size: 14px;
+            box-shadow: 0 4px 16px rgba(201, 169, 98, 0.5);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .marker:hover {
+            transform: scale(1.15);
+        }
+
+        /* Popup */
+        .mapboxgl-popup-content {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-subtle) !important;
+            border-radius: 14px !important;
+            padding: 18px !important;
+            color: var(--text-primary) !important;
+            font-family: 'Outfit', sans-serif !important;
+        }
+
+        .mapboxgl-popup-tip {
+            border-top-color: var(--bg-card) !important;
+        }
+
+        .popup-title {
+            font-weight: 500;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .popup-address {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Install Banner */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+            padding: 16px 24px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 2500;
+        }
+
+        .install-banner.visible {
+            display: flex;
+        }
+
+        .install-btn {
+            background: var(--accent-gold);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .install-dismiss {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 12px;
+        }
+
+        /* Hidden mapbox input */
+        #mapboxToken {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+            .map-container {
+                height: 60vh;
+            }
+            .route-panel {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-height: 60vh;
+                border-radius: 24px 24px 0 0;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 3px;
+        }
+
+        /* Action Buttons Row */
+        .stop-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            border: none;
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 0 4px 12px rgba(201, 169, 98, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Booking Modal */
+        .booking-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .booking-modal-overlay.visible {
+            display: flex;
+        }
+
+        .booking-modal {
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            background: var(--bg-card);
+            border-radius: 24px 24px 0 0;
+            border: 1px solid var(--border-subtle);
+            border-bottom: none;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .booking-modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: linear-gradient(180deg, rgba(201, 169, 98, 0.1) 0%, transparent 100%);
+        }
+
+        .booking-modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .booking-modal-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .booking-modal-close {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .booking-modal-close:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
+        .booking-modal-content {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(85vh - 120px);
+        }
+
+        .booking-options-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        .booking-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .booking-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 18px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .booking-option:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .booking-option.google {
+            background: linear-gradient(135deg, #1a1a24 0%, #252532 100%);
+        }
+
+        .booking-option.google:hover {
+            border-color: #4285f4;
+        }
+
+        .booking-option.sevenrooms {
+            background: linear-gradient(135deg, #1a1a24 0%, #252532 100%);
+        }
+
+        .booking-option.sevenrooms:hover {
+            border-color: #c9a962;
+        }
+
+        .booking-option.whatsapp:hover {
+            border-color: #25d366;
+        }
+
+        .booking-option.call:hover {
+            border-color: var(--accent-teal);
+        }
+
+        .booking-option-label {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .booking-option-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .booking-venue-info {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .booking-venue-info-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .booking-venue-info-value {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .booking-venue-info-value a {
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        .booking-venue-info-value a:hover {
+            text-decoration: underline;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="light"] .theme-toggle-icon {
+            background: var(--accent-gold);
+        }
+
+        [data-theme="light"] .bg-gradient {
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(168, 138, 61, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(94, 179, 167, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(212, 132, 140, 0.03) 0%, transparent 70%);
+        }
+
+        [data-theme="light"] .noise-overlay {
+            opacity: 0.01;
+        }
+
+        /* Desktop modal positioning */
+        @media (min-width: 768px) {
+            .booking-modal-overlay {
+                align-items: center;
+            }
+            .booking-modal {
+                border-radius: 24px;
+                border-bottom: 1px solid var(--border-subtle);
+                max-height: 80vh;
+            }
+            .booking-modal-content {
+                max-height: calc(80vh - 120px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Hidden Mapbox input -->
+    <input type="hidden" id="mapboxToken" value="">
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="theme-toggle" id="themeToggle">
+                <span class="theme-toggle-icon"></span>
+                <span class="theme-toggle-label">Dark</span>
+            </button>
+
+            <div class="logo">
+                <div class="logo-icon">C</div>
+                <div class="logo-text">
+                    <h1 id="appTitle">Crawl</h1>
+                    <p class="tagline">Bar Crawl Planner</p>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="preference-group">
+                <label>Starting Location</label>
+                <div class="location-input-wrapper">
+                    <input type="text" class="location-input" id="locationInput" placeholder="Enter a neighborhood or city...">
+                    <button class="use-location-btn" id="useLocationBtn">GPS</button>
+                </div>
+            </div>
+
+            <!-- Vibe Selection -->
+            <div class="section-title">What's the vibe?</div>
+            <div class="vibe-grid" id="vibeGrid">
+                <div class="vibe-card" data-vibe="chill">
+                    <span class="vibe-name">Chill Drinks</span>
+                </div>
+                <div class="vibe-card" data-vibe="party">
+                    <span class="vibe-name">Party Night</span>
+                </div>
+                <div class="vibe-card" data-vibe="day">
+                    <span class="vibe-name">Day Out</span>
+                </div>
+                <div class="vibe-card" data-vibe="date">
+                    <span class="vibe-name">Date Night</span>
+                </div>
+                <div class="vibe-card" data-vibe="group">
+                    <span class="vibe-name">Group Hangout</span>
+                </div>
+                <div class="vibe-card" data-vibe="explore">
+                    <span class="vibe-name">Surprise Me</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Sub-options based on vibe -->
+            <div class="sub-options" id="subOptions">
+                <div class="sub-options-title" id="subOptionsTitle">What are you into?</div>
+                <div class="chip-container" id="subOptionsChips">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Optional Preferences -->
+            <div class="optional-section">
+                <div class="optional-header" id="optionalHeader">
+                    <span class="optional-title">More Options</span>
+                    <span class="optional-toggle" id="optionalToggle">▼</span>
+                </div>
+                <div class="optional-content" id="optionalContent">
+                    <div class="toggle-row">
+                        <span class="toggle-label">Budget-friendly</span>
+                        <div class="toggle-switch" id="toggleBudget"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Late night (after midnight)</span>
+                        <div class="toggle-switch" id="toggleLateNight"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Live music / entertainment</span>
+                        <div class="toggle-switch" id="toggleLiveMusic"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Open now only</span>
+                        <div class="toggle-switch" id="toggleOpenNow"></div>
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-header">
+                            <span class="slider-label">Number of stops</span>
+                            <span class="slider-value" id="stopsValue">3</span>
+                        </div>
+                        <input type="range" id="stopsSlider" min="2" max="5" value="3">
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-header">
+                            <span class="slider-label">Max travel time between stops</span>
+                            <span class="slider-value" id="travelValue">15 min</span>
+                        </div>
+                        <input type="range" id="travelSlider" min="10" max="30" value="15" step="5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button class="generate-btn" id="generateBtn" disabled>
+                Plan My Night
+            </button>
+
+            <!-- Saved Crawls -->
+            <div class="saved-crawls-section" id="savedCrawlsSection">
+                <div class="saved-crawls-title">Saved Crawls</div>
+                <div id="savedCrawlsList"></div>
+            </div>
+        </aside>
+
+        <!-- Map -->
+        <div class="map-container">
+            <div id="map"></div>
+
+            <div class="route-panel" id="routePanel">
+                <div class="route-header">
+                    <div class="route-header-top">
+                        <h2>Your Crawl</h2>
+                        <div class="route-actions-top">
+                            <button class="route-action-btn" id="saveCrawlBtn">Save</button>
+                            <button class="route-action-btn" id="shareCrawlBtn">Share</button>
+                            <button class="route-action-btn" id="printCrawlBtn">Print</button>
+                        </div>
+                    </div>
+                    <div class="route-stats">
+                        <div class="route-stat">
+                            <span id="totalStops">0 stops</span>
+                        </div>
+                        <div class="route-stat">
+                            <span id="totalTime">0 min</span>
+                        </div>
+                        <div class="route-stat">
+                            <span id="totalDistance">0 km</span>
+                        </div>
+                        <div class="route-stat">
+                            <span id="totalCost">~AED 0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="route-stops" id="routeStops"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+        <div class="loading-text" id="loadingText">Planning your night...</div>
+    </div>
+
+    <!-- Error Toast -->
+    <div class="error-toast" id="errorToast"></div>
+
+    <!-- Install Banner -->
+    <div class="install-banner" id="installBanner">
+        <span>Install Crawl for quick access</span>
+        <div>
+            <button class="install-btn" id="installBtn">Install</button>
+            <button class="install-dismiss" id="installDismiss">×</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-content">
+            <div class="share-modal-title">Share Your Crawl</div>
+            <div class="share-options">
+                <button class="share-option" id="copyLinkBtn">Copy Link</button>
+                <a class="share-option" id="whatsappShareBtn" target="_blank">Share via WhatsApp</a>
+            </div>
+            <button class="share-modal-close" id="shareModalClose">Close</button>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="booking-modal-overlay" id="bookingModalOverlay">
+        <div class="booking-modal">
+            <div class="booking-modal-header">
+                <div>
+                    <div class="booking-modal-title" id="bookingModalTitle">Book a Table</div>
+                    <div class="booking-modal-subtitle" id="bookingModalSubtitle">Choose your booking method</div>
+                </div>
+                <button class="booking-modal-close" id="bookingModalClose">&times;</button>
+            </div>
+            <div class="booking-modal-content">
+                <div class="booking-options-title">Reservation Options</div>
+                <div class="booking-options-grid" id="bookingOptionsGrid">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="booking-venue-info" id="bookingVenueInfo" style="display: none;">
+                    <div class="booking-venue-info-label">Venue Details</div>
+                    <div class="booking-venue-info-value" id="bookingVenueDetails"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vibe-based options configuration
+        const vibeOptions = {
+            chill: {
+                title: "Pick your spots",
+                options: [
+                    { id: "rooftop", label: "Rooftop Bars" },
+                    { id: "lounge", label: "Lounges" },
+                    { id: "wine_bar", label: "Wine Bars" },
+                    { id: "speakeasy", label: "Speakeasies" },
+                    { id: "hotel_bar", label: "Hotel Bars" },
+                    { id: "shisha", label: "Shisha Lounges" },
+                    { id: "jazz", label: "Jazz & Live Music" }
+                ]
+            },
+            party: {
+                title: "What's your scene?",
+                options: [
+                    { id: "nightclub", label: "Nightclubs" },
+                    { id: "dj_bar", label: "DJ Bars" },
+                    { id: "hiphop", label: "Hip-Hop" },
+                    { id: "house", label: "House / Techno" },
+                    { id: "rnb", label: "R&B" },
+                    { id: "arabic", label: "Arabic Night" },
+                    { id: "ladies_night", label: "Ladies' Night" },
+                    { id: "vip", label: "VIP / Bottles" }
+                ]
+            },
+            day: {
+                title: "Daytime vibes",
+                options: [
+                    { id: "beach_club", label: "Beach Clubs" },
+                    { id: "pool_party", label: "Pool Parties" },
+                    { id: "brunch", label: "Boozy Brunch" },
+                    { id: "boat", label: "Boat / Yacht" },
+                    { id: "sunset", label: "Sunset Spots" },
+                    { id: "rooftop_day", label: "Rooftop Lounges" }
+                ]
+            },
+            date: {
+                title: "Set the mood",
+                options: [
+                    { id: "romantic", label: "Romantic & Intimate" },
+                    { id: "rooftop_view", label: "Skyline Views" },
+                    { id: "cocktail", label: "Cocktail Bars" },
+                    { id: "wine", label: "Wine & Dine" },
+                    { id: "speakeasy_date", label: "Hidden Gems" },
+                    { id: "live_music", label: "Live Music" }
+                ]
+            },
+            group: {
+                title: "Group activities",
+                options: [
+                    { id: "sports_bar", label: "Sports Bars" },
+                    { id: "karaoke", label: "Karaoke" },
+                    { id: "games", label: "Games & Activities" },
+                    { id: "pub", label: "Irish Pubs" },
+                    { id: "beer", label: "Craft Beer" },
+                    { id: "shisha_group", label: "Shisha Spots" },
+                    { id: "club_group", label: "Club Night" }
+                ]
+            },
+            explore: {
+                title: "We'll pick the best mix!",
+                options: [
+                    { id: "trending", label: "Trending Now" },
+                    { id: "highly_rated", label: "Highly Rated" },
+                    { id: "hidden_gem", label: "Hidden Gems" },
+                    { id: "iconic", label: "Dubai Icons" },
+                    { id: "new", label: "New Openings" }
+                ]
+            }
+        };
+
+        // State
+        let map;
+        let markers = [];
+        let selectedVibe = null;
+        let selectedOptions = [];
+        let userLocation = null;
+        let deferredPrompt = null;
+
+        // Preferences
+        let prefBudget = false;
+        let prefLateNight = false;
+        let prefLiveMusic = false;
+        let prefOpenNow = false;
+
+        // DOM Elements
+        const mapboxTokenInput = document.getElementById('mapboxToken');
+        const locationInput = document.getElementById('locationInput');
+        const useLocationBtn = document.getElementById('useLocationBtn');
+        const vibeGrid = document.getElementById('vibeGrid');
+        const subOptions = document.getElementById('subOptions');
+        const subOptionsTitle = document.getElementById('subOptionsTitle');
+        const subOptionsChips = document.getElementById('subOptionsChips');
+        const optionalHeader = document.getElementById('optionalHeader');
+        const optionalToggle = document.getElementById('optionalToggle');
+        const optionalContent = document.getElementById('optionalContent');
+        const stopsSlider = document.getElementById('stopsSlider');
+        const stopsValue = document.getElementById('stopsValue');
+        const travelSlider = document.getElementById('travelSlider');
+        const travelValue = document.getElementById('travelValue');
+        const generateBtn = document.getElementById('generateBtn');
+        const routePanel = document.getElementById('routePanel');
+        const routeStops = document.getElementById('routeStops');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+        const errorToast = document.getElementById('errorToast');
+
+        // Initialize
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const themeToggleLabel = themeToggle.querySelector('.theme-toggle-label');
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeToggleLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
+
+            // Update map style if map exists
+            if (map) {
+                const mapStyle = theme === 'dark'
+                    ? 'mapbox://styles/mapbox/dark-v11'
+                    : 'mapbox://styles/mapbox/light-v11';
+                map.setStyle(mapStyle);
+            }
+        }
+
+        function toggleTheme() {
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        function init() {
+            // Apply saved theme
+            setTheme(currentTheme);
+            themeToggle.addEventListener('click', toggleTheme);
+
+            setupVibeSelection();
+            setupOptionalSection();
+            setupSliders();
+            setupLocationButton();
+            setupToggles();
+            setupPWA();
+
+            // Hardcoded Mapbox token
+            const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVtbXlleTg0IiwiYSI6ImNta2xmdzJsNTAwcmwzZHNiMThveHhjd2sifQ.NJYo_4pI1CRyVcCzX4X6mg';
+            initMap(MAPBOX_TOKEN);
+
+            generateBtn.addEventListener('click', generateCrawl);
+            locationInput.addEventListener('input', checkGenerateButton);
+
+            // Update app title based on location
+            const appTitle = document.getElementById('appTitle');
+            locationInput.addEventListener('input', () => {
+                const location = locationInput.value.trim();
+                if (location) {
+                    // Extract city/area name (first part before comma or full text)
+                    const cityName = location.split(',')[0].trim();
+                    appTitle.textContent = `Crawl ${cityName}`;
+                    document.title = `Crawl ${cityName} | Bar Crawl Planner`;
+                } else {
+                    appTitle.textContent = 'Crawl';
+                    document.title = 'Crawl | Nightlife & Bar Crawl Planner';
+                }
+            });
+
+            // Load saved crawls
+            renderSavedCrawls();
+        }
+
+        // Vibe Selection
+        function setupVibeSelection() {
+            vibeGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.vibe-card');
+                if (!card) return;
+
+                // Deselect all
+                document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
+
+                // Select this one
+                card.classList.add('selected');
+                selectedVibe = card.dataset.vibe;
+                selectedOptions = [];
+
+                // Show sub-options
+                showSubOptions(selectedVibe);
+                checkGenerateButton();
+            });
+        }
+
+        function showSubOptions(vibe) {
+            const config = vibeOptions[vibe];
+            if (!config) return;
+
+            subOptionsTitle.textContent = config.title;
+            subOptionsChips.innerHTML = config.options.map(opt =>
+                `<div class="chip" data-option="${opt.id}">${opt.label}</div>`
+            ).join('');
+
+            // Add click handlers
+            subOptionsChips.querySelectorAll('.chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    chip.classList.toggle('selected');
+                    const optionId = chip.dataset.option;
+                    if (chip.classList.contains('selected')) {
+                        selectedOptions.push(optionId);
+                    } else {
+                        selectedOptions = selectedOptions.filter(o => o !== optionId);
+                    }
+                });
+            });
+
+            subOptions.classList.add('visible');
+        }
+
+        // Optional Section
+        function setupOptionalSection() {
+            optionalHeader.addEventListener('click', () => {
+                optionalContent.classList.toggle('visible');
+                optionalHeader.classList.toggle('expanded');
+                optionalToggle.classList.toggle('expanded');
+            });
+        }
+
+        // Toggles
+        function setupToggles() {
+            document.getElementById('toggleBudget').addEventListener('click', function() {
+                this.classList.toggle('active');
+                prefBudget = this.classList.contains('active');
+            });
+            document.getElementById('toggleLateNight').addEventListener('click', function() {
+                this.classList.toggle('active');
+                prefLateNight = this.classList.contains('active');
+            });
+            document.getElementById('toggleLiveMusic').addEventListener('click', function() {
+                this.classList.toggle('active');
+                prefLiveMusic = this.classList.contains('active');
+            });
+            document.getElementById('toggleOpenNow').addEventListener('click', function() {
+                this.classList.toggle('active');
+                prefOpenNow = this.classList.contains('active');
+            });
+        }
+
+        // Sliders
+        function setupSliders() {
+            stopsSlider.addEventListener('input', () => {
+                stopsValue.textContent = stopsSlider.value;
+            });
+            travelSlider.addEventListener('input', () => {
+                travelValue.textContent = travelSlider.value + ' min';
+            });
+        }
+
+        // Location
+        function setupLocationButton() {
+            useLocationBtn.addEventListener('click', () => {
+                if (navigator.geolocation) {
+                    useLocationBtn.textContent = '...';
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            locationInput.value = `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`;
+                            useLocationBtn.textContent = '✓';
+                            if (map) {
+                                map.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 14 });
+                            }
+                            checkGenerateButton();
+                        },
+                        () => {
+                            showError('Could not get location');
+                            useLocationBtn.textContent = 'GPS';
+                        }
+                    );
+                }
+            });
+        }
+
+        // Map
+        function initMap(token) {
+            try {
+                mapboxgl.accessToken = token;
+                const mapStyle = currentTheme === 'dark'
+                    ? 'mapbox://styles/mapbox/dark-v11'
+                    : 'mapbox://styles/mapbox/light-v11';
+                map = new mapboxgl.Map({
+                    container: 'map',
+                    style: mapStyle,
+                    center: [0, 30],
+                    zoom: 2
+                });
+                map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+            } catch (error) {
+                console.error('Map init error:', error);
+            }
+        }
+
+        // Check generate button
+        function checkGenerateButton() {
+            const hasLocation = locationInput.value.trim().length > 0;
+            const hasVibe = selectedVibe !== null;
+            generateBtn.disabled = !(hasLocation && hasVibe);
+        }
+
+        // Build search keywords based on selections
+        function buildSearchKeywords() {
+            let keywords = [];
+
+            // Add vibe-based keywords
+            if (selectedVibe === 'chill') {
+                keywords.push('bar', 'lounge');
+            } else if (selectedVibe === 'party') {
+                keywords.push('nightclub', 'club', 'bar');
+            } else if (selectedVibe === 'day') {
+                keywords.push('beach club', 'pool', 'brunch');
+            } else if (selectedVibe === 'date') {
+                keywords.push('romantic bar', 'cocktail bar', 'lounge');
+            } else if (selectedVibe === 'group') {
+                keywords.push('sports bar', 'pub', 'bar');
+            } else {
+                keywords.push('bar', 'lounge', 'club');
+            }
+
+            // Add selected option keywords
+            const optionKeywords = {
+                rooftop: 'rooftop bar',
+                lounge: 'lounge',
+                wine_bar: 'wine bar',
+                speakeasy: 'speakeasy hidden bar',
+                hotel_bar: 'hotel bar',
+                shisha: 'shisha lounge',
+                jazz: 'jazz bar live music',
+                nightclub: 'nightclub',
+                dj_bar: 'dj bar club',
+                hiphop: 'hip hop club',
+                house: 'techno house club',
+                rnb: 'rnb club',
+                arabic: 'arabic night club',
+                ladies_night: 'ladies night bar',
+                vip: 'vip lounge club',
+                beach_club: 'beach club',
+                pool_party: 'pool party',
+                brunch: 'brunch bar',
+                boat: 'yacht boat party',
+                sunset: 'sunset bar lounge',
+                rooftop_day: 'rooftop lounge',
+                romantic: 'romantic bar lounge',
+                rooftop_view: 'skyline view rooftop',
+                cocktail: 'cocktail bar',
+                wine: 'wine bar',
+                speakeasy_date: 'speakeasy hidden',
+                live_music: 'live music bar',
+                sports_bar: 'sports bar',
+                karaoke: 'karaoke bar',
+                games: 'games bar bowling',
+                pub: 'irish pub',
+                beer: 'craft beer bar',
+                shisha_group: 'shisha lounge',
+                club_group: 'nightclub',
+                trending: 'popular bar',
+                highly_rated: 'best bar lounge',
+                hidden_gem: 'hidden bar speakeasy',
+                iconic: 'famous bar dubai',
+                new: 'new bar lounge'
+            };
+
+            selectedOptions.forEach(opt => {
+                if (optionKeywords[opt]) {
+                    keywords.push(optionKeywords[opt]);
+                }
+            });
+
+            // Add preference keywords
+            if (prefLiveMusic) keywords.push('live music entertainment');
+
+            return keywords.slice(0, 4).join(' ');
+        }
+
+        // Generate crawl
+        async function generateCrawl() {
+            loadingOverlay.classList.add('visible');
+            loadingText.textContent = 'Finding your location...';
+
+            try {
+                let coords = userLocation;
+                if (!coords) {
+                    coords = await geocodeLocation(locationInput.value);
+                }
+                if (!coords) throw new Error('Could not find location');
+
+                map.flyTo({ center: [coords.lng, coords.lat], zoom: 13 });
+
+                loadingText.textContent = 'Discovering venues...';
+                const keyword = buildSearchKeywords();
+                const venues = await searchVenues(coords, keyword);
+
+                if (venues.length < 2) {
+                    throw new Error('Not enough venues found. Try a different area.');
+                }
+
+                loadingText.textContent = 'Planning your route...';
+                const numStops = parseInt(stopsSlider.value);
+                const selectedVenues = selectBestVenues(venues, numStops, coords);
+
+                const route = await getDirections(selectedVenues);
+                displayRoute(selectedVenues, route);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loadingOverlay.classList.remove('visible');
+            }
+        }
+
+        // Geocode
+        async function geocodeLocation(address) {
+            const response = await fetch(`/api/geocode?address=${encodeURIComponent(address)}`);
+            const data = await response.json();
+            if (data.results && data.results.length > 0) {
+                const loc = data.results[0].geometry.location;
+                return { lat: loc.lat, lng: loc.lng };
+            }
+            return null;
+        }
+
+        // Search venues
+        async function searchVenues(coords, keyword) {
+            const radius = 5000;
+            const response = await fetch(
+                `/api/places/nearby?lat=${coords.lat}&lng=${coords.lng}&radius=${radius}&keyword=${encodeURIComponent(keyword)}`
+            );
+            const data = await response.json();
+
+            if (data.results) {
+                return data.results.map(place => ({
+                    id: place.place_id,
+                    name: place.name,
+                    lat: place.geometry.location.lat,
+                    lng: place.geometry.location.lng,
+                    rating: place.rating || 0,
+                    totalRatings: place.user_ratings_total || 0,
+                    priceLevel: place.price_level || 3,
+                    address: place.vicinity,
+                    types: place.types || [],
+                    openNow: place.opening_hours?.open_now,
+                    phone: place.phone || null,
+                    website: place.website || null,
+                    mapsUrl: place.maps_url || null
+                }));
+            }
+            return [];
+        }
+
+        // Select best venues
+        function selectBestVenues(venues, numStops, startCoords) {
+            // Filter by open now if preference is set
+            let filteredVenues = venues;
+            if (prefOpenNow) {
+                filteredVenues = venues.filter(v => v.openNow);
+            }
+
+            // Score venues
+            const scored = filteredVenues.map(v => {
+                let score = v.rating * 10;
+                if (v.totalRatings > 500) score += 15;
+                else if (v.totalRatings > 100) score += 10;
+                if (v.openNow) score += 10;
+                if (prefBudget && v.priceLevel <= 2) score += 10;
+                return { ...v, score };
+            }).sort((a, b) => b.score - a.score);
+
+            // Select with distance consideration
+            const maxTravel = parseInt(travelSlider.value) * 500;
+            const selected = [];
+            let currentPos = startCoords;
+            const available = [...scored];
+
+            while (selected.length < numStops && available.length > 0) {
+                let bestIdx = -1;
+                let bestScore = -1;
+
+                for (let i = 0; i < available.length; i++) {
+                    const v = available[i];
+                    const dist = haversine(currentPos.lat, currentPos.lng, v.lat, v.lng);
+                    if (dist > maxTravel * 1.5 && selected.length > 0) continue;
+                    const combinedScore = v.score - (dist / maxTravel) * 10;
+                    if (combinedScore > bestScore) {
+                        bestScore = combinedScore;
+                        bestIdx = i;
+                    }
+                }
+
+                if (bestIdx === -1) break;
+                const chosen = available.splice(bestIdx, 1)[0];
+                selected.push(chosen);
+                currentPos = { lat: chosen.lat, lng: chosen.lng };
+            }
+
+            return selected;
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        // Get directions
+        async function getDirections(venues) {
+            if (venues.length < 2) return null;
+            const origin = `${venues[0].lat},${venues[0].lng}`;
+            const dest = `${venues[venues.length-1].lat},${venues[venues.length-1].lng}`;
+            let waypoints = '';
+            if (venues.length > 2) {
+                waypoints = '&waypoints=' + venues.slice(1,-1).map(v => `${v.lat},${v.lng}`).join('|');
+            }
+            const response = await fetch(`/api/directions?origin=${origin}&destination=${dest}${waypoints}`);
+            const data = await response.json();
+            if (data.routes && data.routes.length > 0) {
+                const route = data.routes[0];
+                return {
+                    legs: route.legs,
+                    totalDuration: route.legs.reduce((s,l) => s + l.duration.value, 0),
+                    totalDistance: route.legs.reduce((s,l) => s + l.distance.value, 0),
+                    polyline: route.overview_polyline?.points
+                };
+            }
+            return null;
+        }
+
+        // Display route
+        // Store current crawl data for sharing/saving
+        let currentCrawl = { venues: [], route: null };
+
+        function displayRoute(venues, route) {
+            // Store for sharing/saving
+            currentCrawl = { venues, route };
+
+            markers.forEach(m => m.remove());
+            markers = [];
+
+            if (map.getLayer('route')) map.removeLayer('route');
+            if (map.getSource('route')) map.removeSource('route');
+
+            venues.forEach((v, i) => {
+                const el = document.createElement('div');
+                el.className = 'marker';
+                el.textContent = i + 1;
+
+                const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+                    <div class="popup-title">${v.name}</div>
+                    <div class="popup-address">${v.address}</div>
+                `);
+
+                const marker = new mapboxgl.Marker(el)
+                    .setLngLat([v.lng, v.lat])
+                    .setPopup(popup)
+                    .addTo(map);
+                markers.push(marker);
+            });
+
+            if (route && route.polyline) {
+                const coords = decodePolyline(route.polyline);
+                map.addSource('route', {
+                    type: 'geojson',
+                    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: coords } }
+                });
+                map.addLayer({
+                    id: 'route',
+                    type: 'line',
+                    source: 'route',
+                    paint: { 'line-color': '#c9a962', 'line-width': 4, 'line-opacity': 0.8 }
+                });
+            }
+
+            const bounds = new mapboxgl.LngLatBounds();
+            venues.forEach(v => bounds.extend([v.lng, v.lat]));
+            map.fitBounds(bounds, { padding: 80 });
+
+            // Calculate average price level
+            const avgPriceLevel = Math.round(venues.reduce((sum, v) => sum + (v.priceLevel || 3), 0) / venues.length);
+            const priceIndicator = '$'.repeat(avgPriceLevel);
+
+            document.getElementById('totalStops').textContent = `${venues.length} stops`;
+            document.getElementById('totalTime').textContent = route ? `${Math.round(route.totalDuration/60)} min` : 'N/A';
+            document.getElementById('totalDistance').textContent = route ? `${(route.totalDistance/1000).toFixed(1)} km` : 'N/A';
+            document.getElementById('totalCost').textContent = `Avg: ${priceIndicator}`;
+
+            routeStops.innerHTML = venues.map((v, i) => {
+                const mapsUrl = v.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}&query_place_id=${v.id}`;
+                const venueDataAttr = encodeURIComponent(JSON.stringify({
+                    name: v.name,
+                    address: v.address,
+                    phone: v.phone,
+                    website: v.website,
+                    mapsUrl: mapsUrl,
+                    id: v.id
+                }));
+
+                // Build badges
+                const priceSymbols = '$'.repeat(v.priceLevel || 3);
+                let badges = `<span class="venue-badge price">${priceSymbols}</span>`;
+                if (v.openNow) badges += `<span class="venue-badge open-now">Open Now</span>`;
+
+                // Suggested time per stop
+                const suggestedTime = v.priceLevel >= 4 ? '1.5-2 hrs' : '45 min - 1 hr';
+
+                let html = `
+                    <div class="route-stop" data-index="${i}">
+                        <div class="stop-number">${i+1}</div>
+                        <div class="stop-details">
+                            <a href="${mapsUrl}" target="_blank" class="stop-name-link">
+                                <div class="stop-name">${v.name}</div>
+                            </a>
+                            <div class="stop-meta">
+                                <span class="stop-rating">★ ${v.rating.toFixed(1)}</span>
+                                <span>${v.totalRatings} reviews</span>
+                            </div>
+                            <div class="venue-badges">${badges}</div>
+                            <div class="stop-address">${v.address}</div>
+                            <div class="stop-time-suggestion">Suggested: ${suggestedTime}</div>
+                            <div class="stop-actions">
+                                <button class="action-btn primary" onclick="openBookingModal('${venueDataAttr}')">Book</button>
+                                ${v.phone ? `<a href="tel:${v.phone}" class="action-btn">Call</a>` : ''}
+                                <a href="https://wa.me/?text=${encodeURIComponent(`Hi, I'd like to make a reservation at ${v.name}. Do you have availability?`)}" target="_blank" class="action-btn">WhatsApp</a>
+                                <a href="${mapsUrl}" target="_blank" class="action-btn">Maps</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Add travel section with ride buttons between stops
+                if (route && i < venues.length - 1 && route.legs[i]) {
+                    const nextVenue = venues[i + 1];
+                    const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=${v.lat}&pickup[longitude]=${v.lng}&dropoff[latitude]=${nextVenue.lat}&dropoff[longitude]=${nextVenue.lng}&dropoff[nickname]=${encodeURIComponent(nextVenue.name)}`;
+                    const careemUrl = `https://www.careem.com/`;
+
+                    html += `
+                        <div class="stop-walk">
+                            <span class="stop-walk-info">${route.legs[i].duration.text} · ${route.legs[i].distance.text}</span>
+                            <div class="ride-buttons">
+                                <a href="${uberUrl}" target="_blank" class="ride-btn uber">Uber</a>
+                                <a href="${careemUrl}" target="_blank" class="ride-btn careem">Careem</a>
+                            </div>
+                        </div>
+                    `;
+                }
+                return html;
+            }).join('');
+
+            routePanel.classList.add('visible');
+        }
+
+        function decodePolyline(encoded) {
+            const coords = [];
+            let i = 0, lat = 0, lng = 0;
+            while (i < encoded.length) {
+                let b, shift = 0, result = 0;
+                do { b = encoded.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+                lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+                shift = 0; result = 0;
+                do { b = encoded.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+                lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+                coords.push([lng / 1e5, lat / 1e5]);
+            }
+            return coords;
+        }
+
+        function showError(msg) {
+            errorToast.textContent = msg;
+            errorToast.classList.add('visible');
+            setTimeout(() => errorToast.classList.remove('visible'), 4000);
+        }
+
+        // Booking Modal
+        const bookingModalOverlay = document.getElementById('bookingModalOverlay');
+        const bookingModalTitle = document.getElementById('bookingModalTitle');
+        const bookingModalSubtitle = document.getElementById('bookingModalSubtitle');
+        const bookingModalClose = document.getElementById('bookingModalClose');
+        const bookingOptionsGrid = document.getElementById('bookingOptionsGrid');
+        const bookingVenueInfo = document.getElementById('bookingVenueInfo');
+        const bookingVenueDetails = document.getElementById('bookingVenueDetails');
+
+        async function openBookingModal(venueDataEncoded) {
+            const venue = JSON.parse(decodeURIComponent(venueDataEncoded));
+
+            bookingModalTitle.textContent = venue.name;
+            bookingModalSubtitle.textContent = 'Choose how to book';
+
+            // Fetch booking URLs from backend
+            let bookingData = {};
+            try {
+                const response = await fetch(`/api/booking/search?name=${encodeURIComponent(venue.name)}`);
+                bookingData = await response.json();
+            } catch (e) {
+                console.error('Failed to fetch booking data:', e);
+            }
+
+            // Build booking options HTML
+            let optionsHtml = `
+                <a href="${bookingData.sevenroomsUrl || `https://www.sevenrooms.com/explore/search/${encodeURIComponent(venue.name)}?city=dubai`}" target="_blank" class="booking-option sevenrooms">
+                    <span class="booking-option-label">SevenRooms</span>
+                    <span class="booking-option-desc">Book a table</span>
+                </a>
+                <a href="${bookingData.googleSearchUrl || `https://www.google.com/search?q=${encodeURIComponent(venue.name + ' Dubai booking')}`}" target="_blank" class="booking-option google">
+                    <span class="booking-option-label">Search Online</span>
+                    <span class="booking-option-desc">Find booking options</span>
+                </a>
+            `;
+
+            // Add WhatsApp option
+            const whatsappMsg = bookingData.whatsappMsg || `Hi, I'd like to make a reservation at ${venue.name}. Do you have availability?`;
+            optionsHtml += `
+                <a href="https://wa.me/?text=${encodeURIComponent(whatsappMsg)}" target="_blank" class="booking-option whatsapp">
+                    <span class="booking-option-label">WhatsApp</span>
+                    <span class="booking-option-desc">Message to book</span>
+                </a>
+            `;
+
+            // Add Call option if phone available
+            if (venue.phone) {
+                optionsHtml += `
+                    <a href="tel:${venue.phone}" class="booking-option call">
+                        <span class="booking-option-label">Call Venue</span>
+                        <span class="booking-option-desc">${venue.phone}</span>
+                    </a>
+                `;
+            } else {
+                optionsHtml += `
+                    <a href="${venue.mapsUrl}" target="_blank" class="booking-option">
+                        <span class="booking-option-label">Google Maps</span>
+                        <span class="booking-option-desc">Get directions</span>
+                    </a>
+                `;
+            }
+
+            bookingOptionsGrid.innerHTML = optionsHtml;
+
+            // Show venue info if we have details
+            if (venue.address || venue.website) {
+                let detailsHtml = '';
+                if (venue.address) {
+                    detailsHtml += `<span>${venue.address}</span>`;
+                }
+                if (venue.website) {
+                    detailsHtml += `<br><a href="${venue.website}" target="_blank">Visit website</a>`;
+                }
+                bookingVenueDetails.innerHTML = detailsHtml;
+                bookingVenueInfo.style.display = 'block';
+            } else {
+                bookingVenueInfo.style.display = 'none';
+            }
+
+            bookingModalOverlay.classList.add('visible');
+        }
+
+        function closeBookingModal() {
+            bookingModalOverlay.classList.remove('visible');
+        }
+
+        // Close modal on overlay click
+        bookingModalOverlay.addEventListener('click', (e) => {
+            if (e.target === bookingModalOverlay) {
+                closeBookingModal();
+            }
+        });
+
+        // Close button
+        bookingModalClose.addEventListener('click', closeBookingModal);
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && bookingModalOverlay.classList.contains('visible')) {
+                closeBookingModal();
+            }
+            if (e.key === 'Escape' && document.getElementById('shareModal').classList.contains('visible')) {
+                closeShareModal();
+            }
+        });
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        // Share functionality
+        const shareModal = document.getElementById('shareModal');
+        const shareCrawlBtn = document.getElementById('shareCrawlBtn');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const whatsappShareBtn = document.getElementById('whatsappShareBtn');
+        const shareModalClose = document.getElementById('shareModalClose');
+
+        function generateShareText() {
+            if (!currentCrawl.venues.length) return '';
+            const venueList = currentCrawl.venues.map((v, i) => `${i + 1}. ${v.name}`).join('\n');
+            return `Check out my bar crawl!\n\n${venueList}\n\nPlanned with Crawl`;
+        }
+
+        function openShareModal() {
+            const shareText = generateShareText();
+            whatsappShareBtn.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+            shareModal.classList.add('visible');
+        }
+
+        function closeShareModal() {
+            shareModal.classList.remove('visible');
+        }
+
+        shareCrawlBtn.addEventListener('click', openShareModal);
+        shareModalClose.addEventListener('click', closeShareModal);
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) closeShareModal();
+        });
+
+        copyLinkBtn.addEventListener('click', () => {
+            const shareText = generateShareText();
+            navigator.clipboard.writeText(shareText).then(() => {
+                showToast('Crawl copied to clipboard!');
+                closeShareModal();
+            });
+        });
+
+        // Save functionality
+        const saveCrawlBtn = document.getElementById('saveCrawlBtn');
+        const savedCrawlsSection = document.getElementById('savedCrawlsSection');
+        const savedCrawlsList = document.getElementById('savedCrawlsList');
+
+        function getSavedCrawls() {
+            return JSON.parse(localStorage.getItem('savedCrawls') || '[]');
+        }
+
+        function saveCrawl() {
+            if (!currentCrawl.venues.length) return;
+
+            const crawls = getSavedCrawls();
+            const crawlData = {
+                id: Date.now(),
+                name: `${locationInput.value || 'My'} Crawl`,
+                date: new Date().toLocaleDateString(),
+                venues: currentCrawl.venues,
+                route: currentCrawl.route
+            };
+            crawls.unshift(crawlData);
+            if (crawls.length > 10) crawls.pop(); // Keep max 10
+            localStorage.setItem('savedCrawls', JSON.stringify(crawls));
+
+            saveCrawlBtn.textContent = 'Saved!';
+            saveCrawlBtn.classList.add('saved');
+            setTimeout(() => {
+                saveCrawlBtn.textContent = 'Save';
+                saveCrawlBtn.classList.remove('saved');
+            }, 2000);
+
+            showToast('Crawl saved!');
+            renderSavedCrawls();
+        }
+
+        function renderSavedCrawls() {
+            const crawls = getSavedCrawls();
+            if (crawls.length === 0) {
+                savedCrawlsSection.classList.remove('visible');
+                return;
+            }
+
+            savedCrawlsSection.classList.add('visible');
+            savedCrawlsList.innerHTML = crawls.map(crawl => `
+                <div class="saved-crawl-item" data-id="${crawl.id}">
+                    <div class="saved-crawl-name">${crawl.name}</div>
+                    <div class="saved-crawl-meta">${crawl.venues.length} stops · ${crawl.date}</div>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            savedCrawlsList.querySelectorAll('.saved-crawl-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = parseInt(item.dataset.id);
+                    const crawl = crawls.find(c => c.id === id);
+                    if (crawl) {
+                        displayRoute(crawl.venues, crawl.route);
+                    }
+                });
+            });
+        }
+
+        saveCrawlBtn.addEventListener('click', saveCrawl);
+
+        // Print functionality
+        const printCrawlBtn = document.getElementById('printCrawlBtn');
+        printCrawlBtn.addEventListener('click', () => {
+            window.print();
+        });
+
+        // PWA
+        function setupPWA() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (!localStorage.getItem('installDismissed')) {
+                    setTimeout(() => document.getElementById('installBanner').classList.add('visible'), 3000);
+                }
+            });
+            document.getElementById('installBtn').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').classList.remove('visible');
+                }
+            });
+            document.getElementById('installDismiss').addEventListener('click', () => {
+                document.getElementById('installBanner').classList.remove('visible');
+                localStorage.setItem('installDismissed', 'true');
+            });
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
