@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Crawl | Nightlife & Bar Crawl Planner</title>
+    <title>Crawl | Plan Your Night Out</title>
 
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#0a0a0f">
@@ -1530,7 +1530,7 @@
                 <div class="logo-icon">C</div>
                 <div class="logo-text">
                     <h1 id="appTitle">Crawl</h1>
-                    <p class="tagline">Bar Crawl Planner</p>
+                    <p class="tagline">Plan Your Night Out</p>
                 </div>
             </div>
 
@@ -1880,10 +1880,10 @@
                     // Extract city/area name (first part before comma or full text)
                     const cityName = location.split(',')[0].trim();
                     appTitle.textContent = `Crawl ${cityName}`;
-                    document.title = `Crawl ${cityName} | Bar Crawl Planner`;
+                    document.title = `Crawl ${cityName} | Plan Your Night Out`;
                 } else {
                     appTitle.textContent = 'Crawl';
-                    document.title = 'Crawl | Nightlife & Bar Crawl Planner';
+                    document.title = 'Crawl | Plan Your Night Out';
                 }
             });
 
