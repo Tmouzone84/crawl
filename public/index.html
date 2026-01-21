@@ -277,13 +277,14 @@
             background: var(--bg-card);
             border: 2px solid var(--border-subtle);
             border-radius: 16px;
-            padding: 16px;
+            padding: 22px 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
@@ -295,20 +296,107 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .vibe-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent-gold-dark);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        .vibe-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+            transform: rotate(45deg) translateY(100%);
+            transition: transform 0.5s ease;
         }
 
-        .vibe-card.selected {
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 24px rgba(201, 169, 98, 0.3);
+        .vibe-card:hover::after {
+            transform: rotate(45deg) translateY(-100%);
+        }
+
+        .vibe-card:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Individual vibe colors */
+        .vibe-card[data-vibe="chill"] {
+            border-color: rgba(94, 179, 167, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(94, 179, 167, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="chill"]:hover,
+        .vibe-card[data-vibe="chill"].selected {
+            border-color: #5eb3a7;
+            box-shadow: 0 8px 32px rgba(94, 179, 167, 0.3);
+        }
+        .vibe-card[data-vibe="chill"]::before {
+            background: linear-gradient(135deg, #5eb3a7 0%, #3d8b82 100%);
+        }
+
+        .vibe-card[data-vibe="party"] {
+            border-color: rgba(212, 132, 140, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(212, 132, 140, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="party"]:hover,
+        .vibe-card[data-vibe="party"].selected {
+            border-color: #d4848c;
+            box-shadow: 0 8px 32px rgba(212, 132, 140, 0.3);
+        }
+        .vibe-card[data-vibe="party"]::before {
+            background: linear-gradient(135deg, #d4848c 0%, #b85a64 100%);
+        }
+
+        .vibe-card[data-vibe="day"] {
+            border-color: rgba(241, 196, 83, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(241, 196, 83, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="day"]:hover,
+        .vibe-card[data-vibe="day"].selected {
+            border-color: #f1c453;
+            box-shadow: 0 8px 32px rgba(241, 196, 83, 0.3);
+        }
+        .vibe-card[data-vibe="day"]::before {
+            background: linear-gradient(135deg, #f1c453 0%, #d4a32e 100%);
+        }
+
+        .vibe-card[data-vibe="date"] {
+            border-color: rgba(155, 125, 212, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(155, 125, 212, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="date"]:hover,
+        .vibe-card[data-vibe="date"].selected {
+            border-color: #9b7dd4;
+            box-shadow: 0 8px 32px rgba(155, 125, 212, 0.3);
+        }
+        .vibe-card[data-vibe="date"]::before {
+            background: linear-gradient(135deg, #9b7dd4 0%, #7a5bb8 100%);
+        }
+
+        .vibe-card[data-vibe="group"] {
+            border-color: rgba(78, 167, 229, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(78, 167, 229, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="group"]:hover,
+        .vibe-card[data-vibe="group"].selected {
+            border-color: #4ea7e5;
+            box-shadow: 0 8px 32px rgba(78, 167, 229, 0.3);
+        }
+        .vibe-card[data-vibe="group"]::before {
+            background: linear-gradient(135deg, #4ea7e5 0%, #2d7db8 100%);
+        }
+
+        .vibe-card[data-vibe="explore"] {
+            border-color: rgba(201, 169, 98, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(201, 169, 98, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="explore"]:hover,
+        .vibe-card[data-vibe="explore"].selected {
+            border-color: #c9a962;
+            box-shadow: 0 8px 32px rgba(201, 169, 98, 0.3);
+        }
+        .vibe-card[data-vibe="explore"]::before {
+            background: linear-gradient(135deg, #c9a962 0%, #a88a3d 100%);
         }
 
         .vibe-card.selected::before {
@@ -319,10 +407,11 @@
             position: relative;
             z-index: 1;
             color: var(--bg-primary);
+            font-weight: 600;
         }
 
         .vibe-name {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             color: var(--text-primary);
             position: relative;
