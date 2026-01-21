@@ -711,8 +711,77 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
+        /* Route panel overlay for tap-to-close */
+        .route-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .route-overlay.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Pull handle for mobile */
+        .route-pull-handle {
+            display: none;
+            width: 100%;
+            padding: 12px 0 8px;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .route-pull-handle::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 4px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            margin: 0 auto;
+            transition: background 0.2s;
+        }
+
+        .route-pull-handle:active::before {
+            background: var(--accent-gold);
+        }
+
+        /* Close button */
+        .route-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .route-close-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
         .route-header {
             padding: 24px;
+            position: relative;
             border-bottom: 1px solid var(--border-subtle);
             background: linear-gradient(180deg, rgba(201, 169, 98, 0.1) 0%, transparent 100%);
         }
@@ -1309,6 +1378,21 @@
                 border-radius: 24px 24px 0 0;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: none;
+            }
+            .route-panel.visible {
+                transform: translateY(0);
+            }
+            .route-panel.dragging {
+                transition: none;
+            }
+            .route-pull-handle {
+                display: block;
+            }
+            .route-close-btn {
+                display: none;
             }
             .theme-toggle {
                 top: 16px;
@@ -1753,11 +1837,18 @@
             </div>
         </aside>
 
+        <!-- Route Overlay (tap to close on mobile) -->
+        <div class="route-overlay" id="routeOverlay"></div>
+
         <!-- Map -->
         <div class="map-container">
             <div id="map"></div>
 
             <div class="route-panel" id="routePanel">
+                <!-- Pull handle for swipe down on mobile -->
+                <div class="route-pull-handle" id="routePullHandle"></div>
+                <!-- Close button for desktop -->
+                <button class="route-close-btn" id="routeCloseBtn">&times;</button>
                 <div class="route-header">
                     <div class="route-header-top">
                         <h2>Your Crawl</h2>
@@ -2503,6 +2594,7 @@
             }).join('');
 
             routePanel.classList.add('visible');
+            document.getElementById('routeOverlay').classList.add('visible');
         }
 
         function decodePolyline(encoded) {
@@ -2747,32 +2839,78 @@
             window.print();
         });
 
-        // New Crawl - reset and start fresh
-        const newCrawlBtn = document.getElementById('newCrawlBtn');
-        newCrawlBtn.addEventListener('click', () => {
-            // Hide the route panel
+        // Close/dismiss route panel function
+        function closeRoutePanel(resetSelections = false) {
             routePanel.classList.remove('visible');
+            document.getElementById('routeOverlay').classList.remove('visible');
 
-            // Clear selections
-            vibeCards.forEach(c => c.classList.remove('selected'));
-            selectedVibe = null;
-            selectedSubOptions = [];
-            subOptions.classList.remove('visible');
-            generateBtn.disabled = true;
+            if (resetSelections) {
+                // Clear selections
+                vibeCards.forEach(c => c.classList.remove('selected'));
+                selectedVibe = null;
+                selectedSubOptions = [];
+                subOptions.classList.remove('visible');
+                generateBtn.disabled = true;
 
-            // Clear markers and route from map
-            markers.forEach(m => m.remove());
-            markers = [];
-            if (map.getSource('route')) {
-                map.removeLayer('route');
-                map.removeSource('route');
+                // Clear markers and route from map
+                markers.forEach(m => m.remove());
+                markers = [];
+                if (map.getSource('route')) {
+                    map.removeLayer('route');
+                    map.removeSource('route');
+                }
+
+                // Reset current crawl data
+                currentCrawl = null;
             }
-
-            // Reset current crawl data
-            currentCrawl = null;
 
             // Scroll to top on mobile
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // New Crawl button - reset everything
+        const newCrawlBtn = document.getElementById('newCrawlBtn');
+        newCrawlBtn.addEventListener('click', () => closeRoutePanel(true));
+
+        // Close button (desktop)
+        document.getElementById('routeCloseBtn').addEventListener('click', () => closeRoutePanel(false));
+
+        // Tap overlay to close (mobile)
+        document.getElementById('routeOverlay').addEventListener('click', () => closeRoutePanel(false));
+
+        // Swipe down to close (mobile)
+        const pullHandle = document.getElementById('routePullHandle');
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        pullHandle.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            routePanel.classList.add('dragging');
+        }, { passive: true });
+
+        pullHandle.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            if (deltaY > 0) {
+                routePanel.style.transform = `translateY(${deltaY}px)`;
+            }
+        }, { passive: true });
+
+        pullHandle.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            routePanel.classList.remove('dragging');
+            const deltaY = currentY - startY;
+
+            // If dragged more than 100px down, close the panel
+            if (deltaY > 100) {
+                closeRoutePanel(false);
+            }
+            // Reset position
+            routePanel.style.transform = '';
         });
 
         // PWA
