@@ -386,6 +386,32 @@
             background: linear-gradient(135deg, #4ea7e5 0%, #2d7db8 100%);
         }
 
+        .vibe-card[data-vibe="brunch"] {
+            border-color: rgba(255, 159, 67, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(255, 159, 67, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="brunch"]:hover,
+        .vibe-card[data-vibe="brunch"].selected {
+            border-color: #ff9f43;
+            box-shadow: 0 8px 32px rgba(255, 159, 67, 0.3);
+        }
+        .vibe-card[data-vibe="brunch"]::before {
+            background: linear-gradient(135deg, #ff9f43 0%, #e67e22 100%);
+        }
+
+        .vibe-card[data-vibe="ladies"] {
+            border-color: rgba(255, 107, 157, 0.3);
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(255, 107, 157, 0.15) 100%);
+        }
+        .vibe-card[data-vibe="ladies"]:hover,
+        .vibe-card[data-vibe="ladies"].selected {
+            border-color: #ff6b9d;
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
+        }
+        .vibe-card[data-vibe="ladies"]::before {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+        }
+
         .vibe-card[data-vibe="explore"] {
             border-color: rgba(201, 169, 98, 0.3);
             background: linear-gradient(145deg, var(--bg-card) 0%, rgba(201, 169, 98, 0.15) 100%);
@@ -1770,6 +1796,12 @@
                 <div class="vibe-card" data-vibe="group">
                     <span class="vibe-name">Group Hangout</span>
                 </div>
+                <div class="vibe-card" data-vibe="brunch">
+                    <span class="vibe-name">Brunch</span>
+                </div>
+                <div class="vibe-card" data-vibe="ladies">
+                    <span class="vibe-name">Ladies Night</span>
+                </div>
                 <div class="vibe-card" data-vibe="explore">
                     <span class="vibe-name">Surprise Me</span>
                 </div>
@@ -1995,6 +2027,29 @@
                     { id: "beer", label: "Craft Beer" },
                     { id: "shisha_group", label: "Shisha Spots" },
                     { id: "club_group", label: "Club Night" }
+                ]
+            },
+            brunch: {
+                title: "Brunch style",
+                options: [
+                    { id: "bottomless", label: "Bottomless Brunch" },
+                    { id: "pool_brunch", label: "Pool Brunch" },
+                    { id: "rooftop_brunch", label: "Rooftop Brunch" },
+                    { id: "beach_brunch", label: "Beach Brunch" },
+                    { id: "garden_brunch", label: "Garden Brunch" },
+                    { id: "hotel_brunch", label: "Hotel Brunch" },
+                    { id: "casual_brunch", label: "Casual Brunch" }
+                ]
+            },
+            ladies: {
+                title: "Ladies night style",
+                options: [
+                    { id: "free_drinks", label: "Free Drinks" },
+                    { id: "rooftop_ladies", label: "Rooftop Bars" },
+                    { id: "club_ladies", label: "Nightclubs" },
+                    { id: "lounge_ladies", label: "Lounges" },
+                    { id: "cocktail_ladies", label: "Cocktail Bars" },
+                    { id: "dancing", label: "Dancing" }
                 ]
             },
             explore: {
@@ -2260,6 +2315,10 @@
                 keywords.push('romantic bar', 'cocktail bar', 'lounge');
             } else if (selectedVibe === 'group') {
                 keywords.push('sports bar', 'pub', 'bar');
+            } else if (selectedVibe === 'brunch') {
+                keywords.push('brunch', 'bottomless brunch', 'restaurant brunch');
+            } else if (selectedVibe === 'ladies') {
+                keywords.push('ladies night', 'bar', 'lounge');
             } else {
                 keywords.push('bar', 'lounge', 'club');
             }
@@ -2300,10 +2359,26 @@
                 beer: 'craft beer bar',
                 shisha_group: 'shisha lounge',
                 club_group: 'nightclub',
+                // Brunch options
+                bottomless: 'bottomless brunch',
+                pool_brunch: 'pool brunch',
+                rooftop_brunch: 'rooftop brunch',
+                beach_brunch: 'beach brunch',
+                garden_brunch: 'garden brunch restaurant',
+                hotel_brunch: 'hotel brunch',
+                casual_brunch: 'brunch restaurant',
+                // Ladies night options
+                free_drinks: 'ladies night free drinks',
+                rooftop_ladies: 'ladies night rooftop bar',
+                club_ladies: 'ladies night club',
+                lounge_ladies: 'ladies night lounge',
+                cocktail_ladies: 'ladies night cocktail bar',
+                dancing: 'ladies night dancing club',
+                // Explore options
                 trending: 'popular bar',
                 highly_rated: 'best bar lounge',
                 hidden_gem: 'hidden bar speakeasy',
-                iconic: 'famous bar dubai',
+                iconic: 'famous bar',
                 new: 'new bar lounge'
             };
 
