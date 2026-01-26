@@ -1516,7 +1516,7 @@
                 left: 0;
                 right: 0;
                 width: 100%;
-                max-height: 85vh;
+                max-height: 95vh;
                 border-radius: 24px 24px 0 0;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
@@ -1525,6 +1525,7 @@
                 animation: none;
                 border-top: 1px solid rgba(201, 169, 98, 0.3);
                 box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+                z-index: 200;
             }
             .route-panel.visible {
                 transform: translateY(0);
@@ -3677,6 +3678,7 @@
 
             routePanel.classList.add('visible');
             document.getElementById('routeOverlay').classList.add('visible');
+            document.body.style.overflow = 'hidden';
         }
 
         // Timeline helpers
@@ -3979,6 +3981,7 @@
         function closeRoutePanel(resetSelections = false) {
             routePanel.classList.remove('visible');
             document.getElementById('routeOverlay').classList.remove('visible');
+            document.body.style.overflow = '';
 
             if (resetSelections) {
                 // Clear selections

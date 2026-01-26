@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crawl-dubai-v4';
+const CACHE_NAME = 'crawl-dubai-v5';
 const urlsToCache = [
     '/',
     '/index.html',
