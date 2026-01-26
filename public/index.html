@@ -3038,11 +3038,10 @@
 
         // Smart Presets
         function setupPresets() {
-            const presetsGrid = document.getElementById('presetsGrid');
-            presetsGrid.addEventListener('click', (e) => {
-                const btn = e.target.closest('.preset-btn');
-                if (!btn) return;
-                applyPreset(btn.dataset.preset);
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyPreset(btn.dataset.preset);
+                });
             });
         }
 
