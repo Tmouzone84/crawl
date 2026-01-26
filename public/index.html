@@ -2146,6 +2146,352 @@
         .route-stops::-webkit-scrollbar-thumb:hover {
             background: var(--accent-gold);
         }
+
+        /* === SMART PRESETS === */
+        .presets-section {
+            margin-bottom: 24px;
+        }
+
+        .presets-grid {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .presets-grid::-webkit-scrollbar {
+            display: none;
+        }
+
+        .preset-btn {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 24px;
+            border: 1px solid var(--border-glow);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 0 8px rgba(201, 169, 98, 0.1);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 16px rgba(201, 169, 98, 0.25), 0 0 32px rgba(201, 169, 98, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .preset-btn:active {
+            transform: scale(0.96);
+        }
+
+        .preset-btn .preset-icon {
+            font-size: 16px;
+        }
+
+        /* === PROGRESS INDICATOR === */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding: 16px 0;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: var(--border-subtle);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+        }
+
+        .progress-step.active .progress-dot {
+            border-color: var(--accent-gold);
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+            box-shadow: 0 0 12px rgba(201, 169, 98, 0.4);
+        }
+
+        .progress-step.completed .progress-dot {
+            border-color: var(--success);
+            background: var(--success);
+            color: var(--bg-primary);
+        }
+
+        .progress-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+        }
+
+        .progress-step.active .progress-label {
+            color: var(--accent-gold);
+        }
+
+        .progress-step.completed .progress-label {
+            color: var(--success);
+        }
+
+        /* === INTERACTIVE TIMELINE === */
+        .timeline-stop {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-header:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-subtle);
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent-gold);
+            min-width: 70px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .timeline-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .timeline-venue-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .timeline-expand-icon {
+            font-size: 10px;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .timeline-stop.expanded .timeline-expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .timeline-details {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            padding-left: 96px;
+        }
+
+        .timeline-stop.expanded .timeline-details {
+            max-height: 400px;
+            opacity: 1;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .timeline-duration {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        /* Timeline connector line */
+        .route-stops.timeline-view::before {
+            left: 52px;
+            background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose), var(--accent-purple));
+            opacity: 0.4;
+            width: 2px;
+        }
+
+        /* === ENHANCED VENUE BADGES === */
+        .venue-badge.live-music {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .venue-badge.happy-hour {
+            border-color: #ff9f43;
+            color: #ff9f43;
+        }
+
+        .venue-badge.popular {
+            border-color: var(--accent-rose);
+            color: var(--accent-rose);
+        }
+
+        .venue-badge.budget-friendly {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* === WHY IT MATCHES MICROCOPY === */
+        .stop-match-reason {
+            font-size: 11px;
+            font-style: italic;
+            color: var(--accent-gold);
+            margin-top: 4px;
+            opacity: 0.85;
+        }
+
+        /* === NEON ACCENT POLISH === */
+
+        /* Neon glow on selected vibe cards */
+        .vibe-card[data-vibe="chill"].selected {
+            box-shadow: 0 0 16px rgba(94, 179, 167, 0.4), 0 0 40px rgba(94, 179, 167, 0.15);
+        }
+        .vibe-card[data-vibe="party"].selected {
+            box-shadow: 0 0 16px rgba(212, 132, 140, 0.4), 0 0 40px rgba(212, 132, 140, 0.15);
+        }
+        .vibe-card[data-vibe="day"].selected {
+            box-shadow: 0 0 16px rgba(241, 196, 83, 0.4), 0 0 40px rgba(241, 196, 83, 0.15);
+        }
+        .vibe-card[data-vibe="date"].selected {
+            box-shadow: 0 0 16px rgba(155, 125, 212, 0.4), 0 0 40px rgba(155, 125, 212, 0.15);
+        }
+        .vibe-card[data-vibe="group"].selected {
+            box-shadow: 0 0 16px rgba(78, 167, 229, 0.4), 0 0 40px rgba(78, 167, 229, 0.15);
+        }
+        .vibe-card[data-vibe="brunch"].selected {
+            box-shadow: 0 0 16px rgba(255, 159, 67, 0.4), 0 0 40px rgba(255, 159, 67, 0.15);
+        }
+        .vibe-card[data-vibe="ladies"].selected {
+            box-shadow: 0 0 16px rgba(255, 107, 157, 0.4), 0 0 40px rgba(255, 107, 157, 0.15);
+        }
+        .vibe-card[data-vibe="explore"].selected {
+            box-shadow: 0 0 16px rgba(201, 169, 98, 0.4), 0 0 40px rgba(201, 169, 98, 0.15);
+        }
+
+        /* Pulsing neon border on enabled generate button */
+        @keyframes neonPulse {
+            0%, 100% { box-shadow: 0 4px 24px rgba(201, 169, 98, 0.3), 0 0 0 0 rgba(201, 169, 98, 0.3); }
+            50% { box-shadow: 0 4px 24px rgba(201, 169, 98, 0.5), 0 0 20px 2px rgba(201, 169, 98, 0.2); }
+        }
+
+        .generate-btn:not(:disabled) {
+            animation: neonPulse 2.5s ease-in-out infinite;
+        }
+
+        /* Neon underline on section titles */
+        .section-title {
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+            border-radius: 1px;
+        }
+
+        /* Route panel header neon accent line */
+        .route-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 24px;
+            right: 24px;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-rose), var(--accent-purple), transparent);
+            opacity: 0.5;
+        }
+
+        /* Action buttons neon hover glow */
+        .action-btn:hover {
+            box-shadow: 0 4px 16px rgba(201, 169, 98, 0.25), 0 0 8px rgba(201, 169, 98, 0.15);
+        }
+
+        .route-action-btn:hover {
+            box-shadow: 0 4px 16px rgba(201, 169, 98, 0.25), 0 0 8px rgba(201, 169, 98, 0.15);
+        }
+
+        /* Mobile presets horizontal scroll */
+        @media (max-width: 1024px) {
+            .presets-grid {
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+            .progress-bar {
+                margin-bottom: 20px;
+                padding: 12px 0;
+            }
+            .progress-label {
+                font-size: 9px;
+            }
+            .progress-dot {
+                width: 24px;
+                height: 24px;
+                font-size: 10px;
+            }
+            .timeline-details {
+                padding-left: 48px;
+            }
+            .timeline-time {
+                min-width: 56px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2171,6 +2517,26 @@
                 </div>
             </div>
 
+            <!-- Progress Indicator -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-step active" data-step="1">
+                    <div class="progress-dot">1</div>
+                    <span class="progress-label">Vibe</span>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="progress-dot">2</div>
+                    <span class="progress-label">Options</span>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="progress-dot">3</div>
+                    <span class="progress-label">Generate</span>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="progress-dot">4</div>
+                    <span class="progress-label">Explore</span>
+                </div>
+            </div>
+
             <!-- Location -->
             <div class="preference-group">
                 <label>Starting Location</label>
@@ -2178,6 +2544,29 @@
                     <span class="location-icon">📍</span>
                     <input type="text" class="location-input" id="locationInput" placeholder="Enter a neighborhood or city...">
                     <button class="use-location-btn" id="useLocationBtn">GPS</button>
+                </div>
+            </div>
+
+            <!-- Smart Presets -->
+            <div class="presets-section">
+                <div class="section-title">Quick Start</div>
+                <div class="presets-grid" id="presetsGrid">
+                    <button class="preset-btn" data-preset="tonight">
+                        <span class="preset-icon">⚡</span>
+                        <span>Tonight in 5 clicks</span>
+                    </button>
+                    <button class="preset-btn" data-preset="budget">
+                        <span class="preset-icon">💸</span>
+                        <span>Best Budget Crawl</span>
+                    </button>
+                    <button class="preset-btn" data-preset="music">
+                        <span class="preset-icon">🎶</span>
+                        <span>Live Music First</span>
+                    </button>
+                    <button class="preset-btn" data-preset="weekend">
+                        <span class="preset-icon">🌙</span>
+                        <span>Weekend Party</span>
+                    </button>
                 </div>
             </div>
 
@@ -2566,6 +2955,7 @@
             setupLocationButton();
             setupToggles();
             setupDayPicker();
+            setupPresets();
             setupPWA();
 
             // Hardcoded Mapbox token
@@ -2618,6 +3008,7 @@
                 // Show sub-options
                 showSubOptions(selectedVibe);
                 checkGenerateButton();
+                updateProgress(2);
             });
         }
 
@@ -2696,6 +3087,115 @@
                     btn.classList.add('selected');
                     selectedDay = btn.dataset.day;
                 });
+            });
+        }
+
+        // Smart Presets
+        function setupPresets() {
+            const presetsGrid = document.getElementById('presetsGrid');
+            presetsGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.preset-btn');
+                if (!btn) return;
+                applyPreset(btn.dataset.preset);
+            });
+        }
+
+        function applyPreset(presetName) {
+            // Set location default if empty
+            if (!locationInput.value.trim()) {
+                locationInput.value = 'Dubai';
+                locationInput.dispatchEvent(new Event('input'));
+            }
+
+            // Reset toggles
+            ['toggleBudget', 'toggleLateNight', 'toggleLiveMusic', 'toggleOpenNow'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+            });
+            prefBudget = false;
+            prefLateNight = false;
+            prefLiveMusic = false;
+            prefOpenNow = false;
+
+            // Reset day picker
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelector('.day-btn[data-day="today"]').classList.add('selected');
+            selectedDay = 'today';
+
+            // Apply preset-specific settings
+            switch (presetName) {
+                case 'tonight':
+                    selectVibeByName('chill');
+                    stopsSlider.value = 3;
+                    stopsValue.textContent = '3';
+                    document.getElementById('toggleOpenNow').classList.add('active');
+                    prefOpenNow = true;
+                    break;
+                case 'budget':
+                    selectVibeByName('chill');
+                    stopsSlider.value = 4;
+                    stopsValue.textContent = '4';
+                    document.getElementById('toggleBudget').classList.add('active');
+                    prefBudget = true;
+                    break;
+                case 'music':
+                    selectVibeByName('party');
+                    stopsSlider.value = 3;
+                    stopsValue.textContent = '3';
+                    document.getElementById('toggleLiveMusic').classList.add('active');
+                    prefLiveMusic = true;
+                    break;
+                case 'weekend':
+                    selectVibeByName('party');
+                    stopsSlider.value = 4;
+                    stopsValue.textContent = '4';
+                    document.getElementById('toggleLateNight').classList.add('active');
+                    prefLateNight = true;
+                    // Select Friday
+                    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+                    document.querySelector('.day-btn[data-day="5"]').classList.add('selected');
+                    selectedDay = '5';
+                    break;
+            }
+
+            // Open the options section so user can see the applied settings
+            if (!optionalContent.classList.contains('visible')) {
+                optionalContent.classList.add('visible');
+                optionalHeader.classList.add('expanded');
+                optionalToggle.classList.add('expanded');
+            }
+
+            checkGenerateButton();
+            showToast(`Preset applied: ${presetName.charAt(0).toUpperCase() + presetName.slice(1)}`);
+        }
+
+        function selectVibeByName(vibeName) {
+            document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
+            const card = document.querySelector(`.vibe-card[data-vibe="${vibeName}"]`);
+            if (card) {
+                card.classList.add('selected');
+                selectedVibe = vibeName;
+                selectedOptions = [];
+                showSubOptions(vibeName);
+                updateProgress(2);
+            }
+        }
+
+        // Progress Indicator
+        let currentStep = 1;
+
+        function updateProgress(step) {
+            if (step <= currentStep && step !== 1) return;
+            currentStep = step;
+            const steps = document.querySelectorAll('.progress-step');
+            steps.forEach(s => {
+                const stepNum = parseInt(s.dataset.step);
+                s.classList.remove('active', 'completed');
+                if (stepNum < currentStep) {
+                    s.classList.add('completed');
+                    s.querySelector('.progress-dot').textContent = '✓';
+                } else if (stepNum === currentStep) {
+                    s.classList.add('active');
+                }
             });
         }
 
@@ -2870,6 +3370,7 @@
 
         // Generate crawl
         async function generateCrawl() {
+            updateProgress(3);
             loadingOverlay.classList.add('visible');
             loadingText.textContent = 'Finding your location...';
 
@@ -3079,6 +3580,7 @@
         function displayRoute(venues, route) {
             // Store for sharing/saving
             currentCrawl = { venues, route };
+            updateProgress(4);
 
             markers.forEach(m => m.remove());
             markers = [];
@@ -3130,6 +3632,30 @@
             document.getElementById('totalDistance').textContent = route ? `${(route.totalDistance/1000).toFixed(1)} km` : 'N/A';
             document.getElementById('totalCost').textContent = `Avg: ${priceIndicator}`;
 
+            // Calculate suggested arrival times
+            const now = new Date();
+            let startHour = now.getHours();
+            let startMinutes = now.getMinutes();
+            // If daytime (before 5 PM), default to 8 PM
+            if (startHour < 17) {
+                startHour = 20;
+                startMinutes = 0;
+            }
+            // Round up to next 15 min
+            startMinutes = Math.ceil(startMinutes / 15) * 15;
+            if (startMinutes >= 60) {
+                startHour++;
+                startMinutes = 0;
+            }
+            let runningTime = new Date(now);
+            runningTime.setHours(startHour, startMinutes, 0, 0);
+
+            // Current hour for happy hour check
+            const currentHour = now.getHours();
+
+            // Add timeline-view class
+            routeStops.classList.add('timeline-view');
+
             routeStops.innerHTML = venues.map((v, i) => {
                 const mapsUrl = v.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}&query_place_id=${v.id}`;
                 const venueDataAttr = encodeURIComponent(JSON.stringify({
@@ -3141,40 +3667,64 @@
                     id: v.id
                 }));
 
-                // Build badges
+                // Calculate arrival time string
+                const arrivalTime = formatTime(runningTime);
+
+                // Determine venue icon based on types
+                const venueIcon = getVenueIcon(v);
+
+                // Determine suggested duration (minutes)
+                const durationMin = getSuggestedDuration(v);
+                const durationLabel = durationMin >= 60 ? `${(durationMin/60).toFixed(1)} hr` : `${durationMin} min`;
+
+                // Build enhanced badges
                 const priceSymbols = '$'.repeat(v.priceLevel || 3);
                 let badges = `<span class="venue-badge price">${priceSymbols}</span>`;
                 if (v.openNow) badges += `<span class="venue-badge open-now">Open Now</span>`;
+                // Enhanced badges
+                if (hasLiveMusic(v)) badges += `<span class="venue-badge live-music">🎶 Live Music</span>`;
+                if (currentHour >= 17 && currentHour <= 20) badges += `<span class="venue-badge happy-hour">🍹 Happy Hour</span>`;
+                if (v.totalRatings > 500) badges += `<span class="venue-badge popular">🔥 Popular</span>`;
+                if (v.priceLevel && v.priceLevel <= 2) badges += `<span class="venue-badge budget-friendly">💸 Budget</span>`;
 
-                // Suggested time per stop
-                const suggestedTime = v.priceLevel >= 4 ? '1.5-2 hrs' : '45 min - 1 hr';
+                // "Why It Matches" microcopy
+                const matchReason = getMatchReason(v, i, venues, route);
 
                 let html = `
-                    <div class="route-stop" data-index="${i}">
-                        <div class="stop-number">${i+1}</div>
-                        <div class="stop-details">
-                            <a href="${mapsUrl}" target="_blank" class="stop-name-link">
-                                <div class="stop-name">${v.name}</div>
-                            </a>
+                    <div class="timeline-stop" data-index="${i}" onclick="toggleTimelineStop(this)">
+                        <div class="timeline-header">
+                            <span class="timeline-time">${arrivalTime}</span>
+                            <span class="timeline-icon">${venueIcon}</span>
+                            <span class="timeline-venue-name">${v.name}</span>
+                            <span class="timeline-expand-icon">▼</span>
+                        </div>
+                        <div class="timeline-details">
+                            <div class="timeline-duration">⏱ Suggested stay: ${durationLabel}</div>
                             <div class="stop-meta">
                                 <span class="stop-rating">★ ${v.rating.toFixed(1)}</span>
                                 <span>${v.totalRatings} reviews</span>
                             </div>
                             <div class="venue-badges">${badges}</div>
+                            ${matchReason ? `<div class="stop-match-reason">${matchReason}</div>` : ''}
                             <div class="stop-address">${v.address}</div>
-                            <div class="stop-time-suggestion">Suggested: ${suggestedTime}</div>
                             <div class="stop-actions">
-                                <button class="action-btn primary" onclick="openBookingModal('${venueDataAttr}')">Book</button>
-                                ${v.phone ? `<a href="tel:${v.phone}" class="action-btn">Call</a>` : ''}
-                                <a href="https://wa.me/?text=${encodeURIComponent(`Hi, I'd like to make a reservation at ${v.name}. Do you have availability?`)}" target="_blank" class="action-btn">WhatsApp</a>
-                                <a href="${mapsUrl}" target="_blank" class="action-btn">Maps</a>
+                                <button class="action-btn primary" onclick="event.stopPropagation(); openBookingModal('${venueDataAttr}')">Book</button>
+                                ${v.phone ? `<a href="tel:${v.phone}" class="action-btn" onclick="event.stopPropagation()">Call</a>` : ''}
+                                <a href="https://wa.me/?text=${encodeURIComponent(`Hi, I'd like to make a reservation at ${v.name}. Do you have availability?`)}" target="_blank" class="action-btn" onclick="event.stopPropagation()">WhatsApp</a>
+                                <a href="${mapsUrl}" target="_blank" class="action-btn" onclick="event.stopPropagation()">Maps</a>
                             </div>
                         </div>
                     </div>
                 `;
 
+                // Advance running time: duration at venue + travel to next
+                runningTime = new Date(runningTime.getTime() + durationMin * 60000);
+
                 // Add travel section with ride buttons between stops
                 if (route && i < venues.length - 1 && route.legs[i]) {
+                    const travelSec = route.legs[i].duration.value || 0;
+                    runningTime = new Date(runningTime.getTime() + travelSec * 1000);
+
                     const nextVenue = venues[i + 1];
                     const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=${v.lat}&pickup[longitude]=${v.lng}&dropoff[latitude]=${nextVenue.lat}&dropoff[longitude]=${nextVenue.lng}&dropoff[nickname]=${encodeURIComponent(nextVenue.name)}`;
                     const careemUrl = `https://www.careem.com/`;
@@ -3194,6 +3744,61 @@
 
             routePanel.classList.add('visible');
             document.getElementById('routeOverlay').classList.add('visible');
+        }
+
+        // Timeline helpers
+        function toggleTimelineStop(el) {
+            el.classList.toggle('expanded');
+        }
+
+        function formatTime(date) {
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        function getVenueIcon(venue) {
+            const types = (venue.types || []).join(' ').toLowerCase();
+            const name = (venue.name || '').toLowerCase();
+            if (types.includes('night_club') || name.includes('club')) return '🎵';
+            if (types.includes('wine_bar') || name.includes('wine')) return '🍷';
+            if (name.includes('rooftop') || name.includes('sky')) return '🌃';
+            if (name.includes('beach') || name.includes('pool')) return '🏖️';
+            if (name.includes('lounge') || name.includes('shisha')) return '💨';
+            if (name.includes('pub') || name.includes('irish')) return '🍺';
+            return '🍸';
+        }
+
+        function getSuggestedDuration(venue) {
+            const types = (venue.types || []).join(' ').toLowerCase();
+            const name = (venue.name || '').toLowerCase();
+            if (types.includes('night_club') || name.includes('club')) return 90;
+            if (name.includes('brunch')) return 90;
+            if (venue.priceLevel >= 4) return 75;
+            if (name.includes('lounge') || name.includes('rooftop')) return 60;
+            return 45;
+        }
+
+        function hasLiveMusic(venue) {
+            const types = (venue.types || []).join(' ').toLowerCase();
+            const name = (venue.name || '').toLowerCase();
+            return types.includes('entertainment') || types.includes('music') ||
+                   name.includes('jazz') || name.includes('live') || name.includes('music');
+        }
+
+        function getMatchReason(venue, index, venues, route) {
+            if (index === 0) return '✨ Great place to start';
+            if (index === venues.length - 1) return '🌙 Perfect final stop';
+            if (venue.rating >= 4.5 && venue.totalRatings > 100) return '⭐ Highly rated spot';
+            if (venue.openNow) return '🟢 Open right now';
+            if (venue.priceLevel && venue.priceLevel <= 2) return '💰 Easy on the wallet';
+            if (route && route.legs[index - 1]) {
+                const dist = route.legs[index - 1].distance.value;
+                if (dist < 500) return '🚶 Just a short walk';
+            }
+            return '';
         }
 
         function decodePolyline(encoded) {
@@ -3452,11 +4057,16 @@
 
             if (resetSelections) {
                 // Clear selections
-                vibeCards.forEach(c => c.classList.remove('selected'));
+                document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
                 selectedVibe = null;
-                selectedSubOptions = [];
+                selectedOptions = [];
                 subOptions.classList.remove('visible');
                 generateBtn.disabled = true;
+
+                // Reset progress
+                currentStep = 0;
+                updateProgress(1);
+                currentStep = 1;
 
                 // Clear markers and route from map
                 markers.forEach(m => m.remove());
