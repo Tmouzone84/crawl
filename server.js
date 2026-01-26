@@ -104,6 +104,48 @@ app.get('/api/places/nearby', async (req, res) => {
     }
 });
 
+// Get place details by IDs (for shared crawl links)
+app.get('/api/places/details', async (req, res) => {
+    if (!GOOGLE_API_KEY) {
+        return res.status(500).json({ error: 'API key not configured' });
+    }
+    try {
+        const { ids } = req.query;
+        if (!ids) return res.status(400).json({ error: 'Missing ids parameter' });
+
+        const placeIds = ids.split(',').slice(0, 10); // Limit to 10 venues
+        const results = await Promise.all(placeIds.map(async (placeId) => {
+            const response = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Goog-Api-Key': GOOGLE_API_KEY,
+                    'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,rating,userRatingCount,priceLevel,currentOpeningHours,types,primaryType,internationalPhoneNumber,websiteUri,googleMapsUri'
+                }
+            });
+            const place = await response.json();
+            if (place.error) return null;
+            return {
+                place_id: place.id,
+                name: place.displayName?.text || 'Unknown',
+                geometry: { location: { lat: place.location?.latitude, lng: place.location?.longitude } },
+                rating: place.rating || 0,
+                user_ratings_total: place.userRatingCount || 0,
+                price_level: place.priceLevel ? parseInt(place.priceLevel.replace('PRICE_LEVEL_', '')) : 3,
+                vicinity: place.formattedAddress || '',
+                types: place.types || [],
+                opening_hours: { open_now: place.currentOpeningHours?.openNow },
+                phone: place.internationalPhoneNumber || null,
+                website: place.websiteUri || null,
+                maps_url: place.googleMapsUri || null
+            };
+        }));
+
+        res.json({ results: results.filter(Boolean), status: 'OK' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get directions
 app.get('/api/directions', async (req, res) => {
     if (!GOOGLE_API_KEY) {
