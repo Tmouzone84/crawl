@@ -187,6 +187,8 @@
             font-size: 18px;
             font-weight: 500;
             margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -194,7 +196,7 @@
 
         /* Location Input */
         .preference-group {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .preference-group label {
@@ -227,7 +229,8 @@
         .location-input:focus {
             outline: none;
             border-color: var(--accent-gold);
-            box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+            box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1), 0 0 0 6px rgba(201, 169, 98, 0.05);
+            background: var(--bg-card-hover);
         }
 
         .location-input::placeholder {
@@ -278,7 +281,7 @@
             background: var(--bg-card);
             border: 2px solid var(--border-subtle);
             border-radius: 16px;
-            padding: 22px 16px;
+            padding: 18px 16px 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -288,6 +291,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 6px;
+            animation: vibeCardIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
         }
 
         .vibe-card::before {
@@ -450,15 +455,19 @@
         .sub-options {
             background: var(--bg-card);
             border-radius: 16px;
-            padding: 20px;
+            padding: 0 20px;
             margin-bottom: 24px;
             border: 1px solid var(--border-subtle);
-            display: none;
-            animation: expandIn 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.4s ease;
         }
 
         .sub-options.visible {
-            display: block;
+            max-height: 300px;
+            opacity: 1;
+            padding: 20px;
         }
 
         @keyframes expandIn {
@@ -543,12 +552,15 @@
         }
 
         .optional-content {
-            display: none;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
         }
 
         .optional-content.visible {
-            display: block;
-            animation: expandIn 0.3s ease;
+            max-height: 600px;
+            opacity: 1;
         }
 
         /* Day picker */
@@ -742,7 +754,7 @@
             overflow: hidden;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            box-shadow: 0 4px 24px rgba(201, 169, 98, 0.3);
+            box-shadow: 0 4px 24px rgba(201, 169, 98, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .generate-btn::before {
@@ -762,11 +774,17 @@
 
         .generate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(201, 169, 98, 0.4);
+            box-shadow: 0 8px 32px rgba(201, 169, 98, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.15em;
+        }
+
+        .generate-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 12px rgba(201, 169, 98, 0.3);
         }
 
         .generate-btn:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
             transform: none;
         }
@@ -893,7 +911,7 @@
         .route-action-btn {
             background: var(--bg-primary);
             border: 1px solid var(--border-subtle);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 8px 12px;
             color: var(--text-secondary);
             font-size: 11px;
@@ -905,6 +923,13 @@
         .route-action-btn:hover {
             border-color: var(--accent-gold);
             color: var(--text-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .route-action-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
 
         .route-action-btn.saved {
@@ -920,7 +945,7 @@
         }
 
         .route-action-btn.new-crawl-btn:hover {
-            box-shadow: 0 4px 12px rgba(201, 169, 98, 0.4);
+            box-shadow: 0 4px 16px rgba(201, 169, 98, 0.5), 0 0 24px rgba(201, 169, 98, 0.2);
         }
 
         .route-stats {
@@ -934,23 +959,54 @@
             gap: 6px;
             font-size: 13px;
             color: var(--text-secondary);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 5px 12px;
         }
 
         .route-stops {
             padding: 16px 24px;
             max-height: 450px;
             overflow-y: auto;
+            position: relative;
+        }
+
+        .route-stops::before {
+            content: '';
+            position: absolute;
+            left: 41px;
+            top: 16px;
+            bottom: 16px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+            opacity: 0.3;
+            border-radius: 1px;
+            z-index: 0;
         }
 
         .route-stop {
             display: flex;
             gap: 14px;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            animation: stopSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+        }
+
+        .route-stop:hover {
+            background: var(--bg-card-hover);
+            transform: translateX(4px);
+            border-color: var(--border-subtle);
         }
 
         .route-stop:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
         }
 
         .stop-number {
@@ -1237,6 +1293,8 @@
 
         .saved-crawl-item:hover {
             border-color: var(--accent-gold);
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .saved-crawl-name {
@@ -1290,12 +1348,14 @@
             width: 100%;
             height: 100%;
             background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(12px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 3000;
             flex-direction: column;
             gap: 24px;
+            animation: fadeInOverlay 0.3s ease;
         }
 
         .loading-overlay.visible {
@@ -1307,6 +1367,7 @@
             height: 56px;
             border: 2px solid var(--border-subtle);
             border-top-color: var(--accent-gold);
+            border-right-color: var(--accent-gold);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -1319,6 +1380,7 @@
             font-family: 'Cormorant Garamond', serif;
             font-size: 18px;
             color: var(--text-secondary);
+            animation: pulseText 2s ease-in-out infinite;
         }
 
         /* Error Toast */
@@ -1334,6 +1396,8 @@
             font-size: 14px;
             z-index: 3000;
             display: none;
+            box-shadow: 0 8px 32px rgba(212, 132, 140, 0.4);
+            backdrop-filter: blur(8px);
         }
 
         .error-toast.visible {
@@ -1444,6 +1508,7 @@
                 max-height: none;
                 overflow-y: visible;
                 padding-bottom: 100px;
+                padding-bottom: calc(100px + env(safe-area-inset-bottom));
                 -webkit-overflow-scrolling: touch;
             }
             .map-container {
@@ -1462,8 +1527,10 @@
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
                 animation: none;
+                border-top: 1px solid rgba(201, 169, 98, 0.3);
+                box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
             }
             .route-panel.visible {
                 transform: translateY(0);
@@ -1473,6 +1540,17 @@
             }
             .route-pull-handle {
                 display: block;
+                padding: 14px 0 10px;
+            }
+            .route-pull-handle::before {
+                width: 44px;
+                height: 5px;
+                background: var(--text-muted);
+                transition: all 0.3s ease;
+            }
+            .route-panel.dragging .route-pull-handle::before {
+                width: 56px;
+                background: var(--accent-gold);
             }
             .route-close-btn {
                 display: none;
@@ -1481,6 +1559,7 @@
                 max-height: none;
                 overflow-y: visible;
                 padding-bottom: 24px;
+                padding-bottom: calc(24px + env(safe-area-inset-bottom));
             }
             .theme-toggle {
                 top: 16px;
@@ -1488,15 +1567,88 @@
                 padding: 6px 10px;
                 font-size: 11px;
             }
+            /* 4C. Mobile Vibe Grid */
             .vibe-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
             .vibe-card {
-                padding: 16px 12px;
+                padding: 14px 10px 12px;
+                min-height: 72px;
+            }
+            .vibe-emoji {
+                font-size: 20px;
             }
             .vibe-name {
                 font-size: 12px;
+            }
+            /* 4A. Touch Targets */
+            .chip {
+                min-height: 40px;
+                padding: 10px 18px;
+                font-size: 13px;
+                display: flex;
+                align-items: center;
+            }
+            .day-btn {
+                min-width: 40px;
+                height: 40px;
+            }
+            .toggle-switch {
+                width: 50px;
+                height: 28px;
+                border-radius: 14px;
+            }
+            .toggle-switch::after {
+                width: 22px;
+                height: 22px;
+            }
+            .toggle-switch.active::after {
+                transform: translateX(22px);
+            }
+            .toggle-row {
+                padding: 14px 0;
+                font-size: 14px;
+            }
+            .action-btn {
+                min-height: 40px;
+                display: inline-flex;
+                align-items: center;
+            }
+            /* 4D. Mobile Layout Polish */
+            .route-stats {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .route-actions-top {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .stop-actions {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .stop-actions .action-btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 0;
+            }
+        }
+
+        @media (max-width: 1024px) and (min-width: 420px) {
+            .vibe-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            .vibe-card {
+                padding: 12px 8px 10px;
+                min-height: 68px;
+            }
+            .vibe-emoji {
+                font-size: 18px;
+            }
+            .vibe-name {
+                font-size: 11px;
             }
         }
 
@@ -1525,7 +1677,7 @@
             align-items: center;
             gap: 5px;
             padding: 6px 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 11px;
             font-weight: 500;
             text-decoration: none;
@@ -1540,7 +1692,13 @@
         .action-btn:hover {
             border-color: var(--accent-gold);
             color: var(--text-primary);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
 
         .action-btn.primary {
@@ -1806,6 +1964,188 @@
                 max-height: calc(80vh - 120px);
             }
         }
+
+        /* === UI POLISH === */
+
+        /* 1A. Vibe Card Emojis */
+        .vibe-emoji {
+            font-size: 24px;
+            display: block;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1;
+        }
+
+        .vibe-card:hover .vibe-emoji {
+            transform: scale(1.15);
+        }
+
+        .vibe-card.selected .vibe-emoji {
+            transform: scale(1.2);
+            z-index: 1;
+        }
+
+        /* 1B. Staggered Vibe Card Entrance */
+        @keyframes vibeCardIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .vibe-card:nth-child(1) { animation-delay: 0.05s; }
+        .vibe-card:nth-child(2) { animation-delay: 0.1s; }
+        .vibe-card:nth-child(3) { animation-delay: 0.15s; }
+        .vibe-card:nth-child(4) { animation-delay: 0.2s; }
+        .vibe-card:nth-child(5) { animation-delay: 0.25s; }
+        .vibe-card:nth-child(6) { animation-delay: 0.3s; }
+        .vibe-card:nth-child(7) { animation-delay: 0.35s; }
+        .vibe-card:nth-child(8) { animation-delay: 0.4s; }
+
+        /* 1D. Location Icon Pulse */
+        @keyframes locationPulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
+        }
+
+        .location-input:focus + .use-location-btn,
+        .location-input:focus ~ .use-location-btn {
+            border-color: var(--accent-gold);
+        }
+
+        .location-input:focus ~ .location-icon,
+        .location-input-wrapper:focus-within .location-icon {
+            animation: locationPulse 1.5s ease-in-out infinite;
+        }
+
+        /* 2D. Staggered Stop Entrance */
+        @keyframes stopSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .route-stop:nth-child(1) { animation-delay: 0.05s; }
+        .route-stop:nth-child(2) { animation-delay: 0.1s; }
+        .route-stop:nth-child(3) { animation-delay: 0.15s; }
+        .route-stop:nth-child(4) { animation-delay: 0.2s; }
+        .route-stop:nth-child(5) { animation-delay: 0.25s; }
+        .route-stop:nth-child(6) { animation-delay: 0.3s; }
+        .route-stop:nth-child(7) { animation-delay: 0.35s; }
+        .route-stop:nth-child(8) { animation-delay: 0.4s; }
+
+        /* 3A. Loading Overlay Fade-in */
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 3B. Global Active/Press States */
+        .vibe-card:active {
+            transform: scale(0.97) !important;
+        }
+
+        .chip:active {
+            transform: scale(0.95);
+        }
+
+        .day-btn:active {
+            transform: scale(0.92);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 3C. Focus-Visible States */
+        :focus-visible {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 2px;
+        }
+
+        .vibe-card:focus-visible {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(201, 169, 98, 0.15);
+        }
+
+        .generate-btn:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 2px;
+        }
+
+        .chip:focus-visible {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 1px;
+        }
+
+        /* 3D. Micro-Interactions */
+        @keyframes selectBounce {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.06); }
+            70% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        .vibe-card.selected {
+            animation: selectBounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes chipSelect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .chip.selected {
+            animation: chipSelect 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            box-shadow: 0 0 12px rgba(201, 169, 98, 0.4);
+        }
+
+        @keyframes savePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201, 169, 98, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(201, 169, 98, 0); }
+        }
+
+        .route-action-btn.saved {
+            animation: savePulse 1s ease;
+        }
+
+        /* 3E. Route Stops Scrollbar */
+        .route-stops::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .route-stops::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .route-stops::-webkit-scrollbar-thumb {
+            background: var(--accent-gold-dark);
+            border-radius: 2px;
+        }
+
+        .route-stops::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-gold);
+        }
     </style>
 </head>
 <body>
@@ -1835,6 +2175,7 @@
             <div class="preference-group">
                 <label>Starting Location</label>
                 <div class="location-input-wrapper">
+                    <span class="location-icon">📍</span>
                     <input type="text" class="location-input" id="locationInput" placeholder="Enter a neighborhood or city...">
                     <button class="use-location-btn" id="useLocationBtn">GPS</button>
                 </div>
@@ -1844,27 +2185,35 @@
             <div class="section-title">What's the vibe?</div>
             <div class="vibe-grid" id="vibeGrid">
                 <div class="vibe-card" data-vibe="chill">
+                    <span class="vibe-emoji">🍸</span>
                     <span class="vibe-name">Chill Drinks</span>
                 </div>
                 <div class="vibe-card" data-vibe="party">
+                    <span class="vibe-emoji">🎉</span>
                     <span class="vibe-name">Party Night</span>
                 </div>
                 <div class="vibe-card" data-vibe="day">
+                    <span class="vibe-emoji">☀️</span>
                     <span class="vibe-name">Day Out</span>
                 </div>
                 <div class="vibe-card" data-vibe="date">
+                    <span class="vibe-emoji">💜</span>
                     <span class="vibe-name">Date Night</span>
                 </div>
                 <div class="vibe-card" data-vibe="group">
+                    <span class="vibe-emoji">👥</span>
                     <span class="vibe-name">Group Hangout</span>
                 </div>
                 <div class="vibe-card" data-vibe="brunch">
+                    <span class="vibe-emoji">🥂</span>
                     <span class="vibe-name">Brunch</span>
                 </div>
                 <div class="vibe-card" data-vibe="ladies">
+                    <span class="vibe-emoji">💃</span>
                     <span class="vibe-name">Ladies Night</span>
                 </div>
                 <div class="vibe-card" data-vibe="explore">
+                    <span class="vibe-emoji">✨</span>
                     <span class="vibe-name">Surprise Me</span>
                 </div>
             </div>
@@ -1969,15 +2318,19 @@
                     </div>
                     <div class="route-stats">
                         <div class="route-stat">
+                            <span>📍</span>
                             <span id="totalStops">0 stops</span>
                         </div>
                         <div class="route-stat">
+                            <span>⏱</span>
                             <span id="totalTime">0 min</span>
                         </div>
                         <div class="route-stat">
+                            <span>📏</span>
                             <span id="totalDistance">0 km</span>
                         </div>
                         <div class="route-stat">
+                            <span>💰</span>
                             <span id="totalCost">~AED 0</span>
                         </div>
                     </div>
@@ -2243,6 +2596,9 @@
 
             // Load saved crawls
             renderSavedCrawls();
+
+            // Check for shared crawl in URL
+            loadSharedCrawl();
         }
 
         // Vibe Selection
@@ -2541,6 +2897,56 @@
                 const route = await getDirections(selectedVenues);
                 displayRoute(selectedVenues, route);
 
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loadingOverlay.classList.remove('visible');
+            }
+        }
+
+        // Load shared crawl from URL hash
+        async function loadSharedCrawl() {
+            const hash = window.location.hash;
+            if (!hash.startsWith('#crawl=')) return;
+
+            const ids = hash.replace('#crawl=', '');
+            if (!ids) return;
+
+            loadingOverlay.classList.add('visible');
+            loadingText.textContent = 'Loading shared crawl...';
+
+            try {
+                const response = await fetch(`/api/places/details?ids=${encodeURIComponent(ids)}`);
+                const data = await response.json();
+
+                if (!data.results || data.results.length < 2) {
+                    throw new Error('Could not load shared crawl.');
+                }
+
+                const venues = data.results.map(place => ({
+                    id: place.place_id,
+                    name: place.name,
+                    lat: place.geometry.location.lat,
+                    lng: place.geometry.location.lng,
+                    rating: place.rating || 0,
+                    totalRatings: place.user_ratings_total || 0,
+                    priceLevel: place.price_level || 3,
+                    address: place.vicinity,
+                    types: place.types || [],
+                    openNow: place.opening_hours?.open_now,
+                    phone: place.phone || null,
+                    website: place.website || null,
+                    mapsUrl: place.maps_url || null
+                }));
+
+                loadingText.textContent = 'Planning route...';
+                const route = await getDirections(venues);
+
+                map.flyTo({ center: [venues[0].lng, venues[0].lat], zoom: 13 });
+                displayRoute(venues, route);
+
+                // Clear hash so refreshing doesn't re-trigger
+                history.replaceState(null, '', window.location.pathname);
             } catch (error) {
                 showError(error.message);
             } finally {
@@ -2932,10 +3338,17 @@
         const whatsappShareBtn = document.getElementById('whatsappShareBtn');
         const shareModalClose = document.getElementById('shareModalClose');
 
+        function generateShareUrl() {
+            if (!currentCrawl.venues.length) return '';
+            const ids = currentCrawl.venues.map(v => v.id).join(',');
+            return `${window.location.origin}${window.location.pathname}#crawl=${ids}`;
+        }
+
         function generateShareText() {
             if (!currentCrawl.venues.length) return '';
             const venueList = currentCrawl.venues.map((v, i) => `${i + 1}. ${v.name}`).join('\n');
-            return `Check out my bar crawl!\n\n${venueList}\n\nPlanned with Crawl`;
+            const shareUrl = generateShareUrl();
+            return `Check out my bar crawl!\n\n${venueList}\n\n${shareUrl}`;
         }
 
         function openShareModal() {
@@ -2955,9 +3368,9 @@
         });
 
         copyLinkBtn.addEventListener('click', () => {
-            const shareText = generateShareText();
-            navigator.clipboard.writeText(shareText).then(() => {
-                showToast('Crawl copied to clipboard!');
+            const shareUrl = generateShareUrl();
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Link copied to clipboard!');
                 closeShareModal();
             });
         });
