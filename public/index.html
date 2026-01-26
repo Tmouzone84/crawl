@@ -219,7 +219,6 @@
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
             padding: 16px 20px;
-            padding-left: 48px;
             color: var(--text-primary);
             font-size: 15px;
             font-family: 'Outfit', sans-serif;
@@ -235,15 +234,6 @@
 
         .location-input::placeholder {
             color: var(--text-muted);
-        }
-
-        .location-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-gold);
-            font-size: 16px;
         }
 
         .use-location-btn {
@@ -1568,19 +1558,23 @@
                 font-size: 11px;
             }
             /* 4C. Mobile Vibe Grid */
+            .preference-group {
+                margin-bottom: 16px;
+            }
             .vibe-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+                margin-bottom: 14px;
             }
             .vibe-card {
-                padding: 14px 10px 12px;
-                min-height: 72px;
-            }
-            .vibe-emoji {
-                font-size: 20px;
+                padding: 8px 4px 6px;
+                min-height: 48px;
+                border-radius: 10px;
+                border-width: 1.5px;
+                gap: 2px;
             }
             .vibe-name {
-                font-size: 12px;
+                font-size: 10px;
             }
             /* 4A. Touch Targets */
             .chip {
@@ -1641,11 +1635,10 @@
                 gap: 8px;
             }
             .vibe-card {
-                padding: 12px 8px 10px;
-                min-height: 68px;
-            }
-            .vibe-emoji {
-                font-size: 18px;
+                padding: 10px 6px 8px;
+                min-height: 54px;
+                border-radius: 12px;
+                gap: 3px;
             }
             .vibe-name {
                 font-size: 11px;
@@ -1967,25 +1960,6 @@
 
         /* === UI POLISH === */
 
-        /* 1A. Vibe Card Emojis */
-        .vibe-emoji {
-            font-size: 24px;
-            display: block;
-            position: relative;
-            z-index: 1;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            line-height: 1;
-        }
-
-        .vibe-card:hover .vibe-emoji {
-            transform: scale(1.15);
-        }
-
-        .vibe-card.selected .vibe-emoji {
-            transform: scale(1.2);
-            z-index: 1;
-        }
-
         /* 1B. Staggered Vibe Card Entrance */
         @keyframes vibeCardIn {
             from {
@@ -2007,20 +1981,9 @@
         .vibe-card:nth-child(7) { animation-delay: 0.35s; }
         .vibe-card:nth-child(8) { animation-delay: 0.4s; }
 
-        /* 1D. Location Icon Pulse */
-        @keyframes locationPulse {
-            0%, 100% { transform: translateY(-50%) scale(1); }
-            50% { transform: translateY(-50%) scale(1.2); }
-        }
-
         .location-input:focus + .use-location-btn,
         .location-input:focus ~ .use-location-btn {
             border-color: var(--accent-gold);
-        }
-
-        .location-input:focus ~ .location-icon,
-        .location-input-wrapper:focus-within .location-icon {
-            animation: locationPulse 1.5s ease-in-out infinite;
         }
 
         /* 2D. Staggered Stop Entrance */
@@ -2192,10 +2155,6 @@
 
         .preset-btn:active {
             transform: scale(0.96);
-        }
-
-        .preset-btn .preset-icon {
-            font-size: 16px;
         }
 
         /* === PROGRESS INDICATOR === */
@@ -2472,17 +2431,29 @@
                 flex-wrap: nowrap;
                 -webkit-overflow-scrolling: touch;
             }
+            .presets-section {
+                margin-bottom: 16px;
+            }
+            .preset-btn {
+                padding: 7px 12px;
+                font-size: 12px;
+                gap: 6px;
+            }
             .progress-bar {
-                margin-bottom: 20px;
-                padding: 12px 0;
+                margin-bottom: 12px;
+                padding: 8px 0;
             }
             .progress-label {
-                font-size: 9px;
+                font-size: 8px;
             }
             .progress-dot {
-                width: 24px;
-                height: 24px;
-                font-size: 10px;
+                width: 20px;
+                height: 20px;
+                font-size: 9px;
+            }
+            .section-title {
+                font-size: 13px;
+                margin-bottom: 8px;
             }
             .timeline-details {
                 padding-left: 48px;
@@ -2541,7 +2512,6 @@
             <div class="preference-group">
                 <label>Starting Location</label>
                 <div class="location-input-wrapper">
-                    <span class="location-icon">📍</span>
                     <input type="text" class="location-input" id="locationInput" placeholder="Enter a neighborhood or city...">
                     <button class="use-location-btn" id="useLocationBtn">GPS</button>
                 </div>
@@ -2551,22 +2521,10 @@
             <div class="presets-section">
                 <div class="section-title">Quick Start</div>
                 <div class="presets-grid" id="presetsGrid">
-                    <button class="preset-btn" data-preset="tonight">
-                        <span class="preset-icon">⚡</span>
-                        <span>Tonight in 5 clicks</span>
-                    </button>
-                    <button class="preset-btn" data-preset="budget">
-                        <span class="preset-icon">💸</span>
-                        <span>Best Budget Crawl</span>
-                    </button>
-                    <button class="preset-btn" data-preset="music">
-                        <span class="preset-icon">🎶</span>
-                        <span>Live Music First</span>
-                    </button>
-                    <button class="preset-btn" data-preset="weekend">
-                        <span class="preset-icon">🌙</span>
-                        <span>Weekend Party</span>
-                    </button>
+                    <button class="preset-btn" data-preset="tonight">Tonight in 5 clicks</button>
+                    <button class="preset-btn" data-preset="budget">Best Budget Crawl</button>
+                    <button class="preset-btn" data-preset="music">Live Music First</button>
+                    <button class="preset-btn" data-preset="weekend">Weekend Party</button>
                 </div>
             </div>
 
@@ -2574,35 +2532,27 @@
             <div class="section-title">What's the vibe?</div>
             <div class="vibe-grid" id="vibeGrid">
                 <div class="vibe-card" data-vibe="chill">
-                    <span class="vibe-emoji">🍸</span>
                     <span class="vibe-name">Chill Drinks</span>
                 </div>
                 <div class="vibe-card" data-vibe="party">
-                    <span class="vibe-emoji">🎉</span>
                     <span class="vibe-name">Party Night</span>
                 </div>
                 <div class="vibe-card" data-vibe="day">
-                    <span class="vibe-emoji">☀️</span>
                     <span class="vibe-name">Day Out</span>
                 </div>
                 <div class="vibe-card" data-vibe="date">
-                    <span class="vibe-emoji">💜</span>
                     <span class="vibe-name">Date Night</span>
                 </div>
                 <div class="vibe-card" data-vibe="group">
-                    <span class="vibe-emoji">👥</span>
                     <span class="vibe-name">Group Hangout</span>
                 </div>
                 <div class="vibe-card" data-vibe="brunch">
-                    <span class="vibe-emoji">🥂</span>
                     <span class="vibe-name">Brunch</span>
                 </div>
                 <div class="vibe-card" data-vibe="ladies">
-                    <span class="vibe-emoji">💃</span>
                     <span class="vibe-name">Ladies Night</span>
                 </div>
                 <div class="vibe-card" data-vibe="explore">
-                    <span class="vibe-emoji">✨</span>
                     <span class="vibe-name">Surprise Me</span>
                 </div>
             </div>
@@ -2707,19 +2657,15 @@
                     </div>
                     <div class="route-stats">
                         <div class="route-stat">
-                            <span>📍</span>
                             <span id="totalStops">0 stops</span>
                         </div>
                         <div class="route-stat">
-                            <span>⏱</span>
                             <span id="totalTime">0 min</span>
                         </div>
                         <div class="route-stat">
-                            <span>📏</span>
                             <span id="totalDistance">0 km</span>
                         </div>
                         <div class="route-stat">
-                            <span>💰</span>
                             <span id="totalCost">~AED 0</span>
                         </div>
                     </div>
@@ -3682,10 +3628,10 @@
                 let badges = `<span class="venue-badge price">${priceSymbols}</span>`;
                 if (v.openNow) badges += `<span class="venue-badge open-now">Open Now</span>`;
                 // Enhanced badges
-                if (hasLiveMusic(v)) badges += `<span class="venue-badge live-music">🎶 Live Music</span>`;
-                if (currentHour >= 17 && currentHour <= 20) badges += `<span class="venue-badge happy-hour">🍹 Happy Hour</span>`;
-                if (v.totalRatings > 500) badges += `<span class="venue-badge popular">🔥 Popular</span>`;
-                if (v.priceLevel && v.priceLevel <= 2) badges += `<span class="venue-badge budget-friendly">💸 Budget</span>`;
+                if (hasLiveMusic(v)) badges += `<span class="venue-badge live-music">Live Music</span>`;
+                if (currentHour >= 17 && currentHour <= 20) badges += `<span class="venue-badge happy-hour">Happy Hour</span>`;
+                if (v.totalRatings > 500) badges += `<span class="venue-badge popular">Popular</span>`;
+                if (v.priceLevel && v.priceLevel <= 2) badges += `<span class="venue-badge budget-friendly">Budget</span>`;
 
                 // "Why It Matches" microcopy
                 const matchReason = getMatchReason(v, i, venues, route);
@@ -3699,7 +3645,7 @@
                             <span class="timeline-expand-icon">▼</span>
                         </div>
                         <div class="timeline-details">
-                            <div class="timeline-duration">⏱ Suggested stay: ${durationLabel}</div>
+                            <div class="timeline-duration">Suggested stay: ${durationLabel}</div>
                             <div class="stop-meta">
                                 <span class="stop-rating">★ ${v.rating.toFixed(1)}</span>
                                 <span>${v.totalRatings} reviews</span>
@@ -3760,15 +3706,7 @@
         }
 
         function getVenueIcon(venue) {
-            const types = (venue.types || []).join(' ').toLowerCase();
-            const name = (venue.name || '').toLowerCase();
-            if (types.includes('night_club') || name.includes('club')) return '🎵';
-            if (types.includes('wine_bar') || name.includes('wine')) return '🍷';
-            if (name.includes('rooftop') || name.includes('sky')) return '🌃';
-            if (name.includes('beach') || name.includes('pool')) return '🏖️';
-            if (name.includes('lounge') || name.includes('shisha')) return '💨';
-            if (name.includes('pub') || name.includes('irish')) return '🍺';
-            return '🍸';
+            return '•';
         }
 
         function getSuggestedDuration(venue) {
@@ -3789,14 +3727,14 @@
         }
 
         function getMatchReason(venue, index, venues, route) {
-            if (index === 0) return '✨ Great place to start';
-            if (index === venues.length - 1) return '🌙 Perfect final stop';
-            if (venue.rating >= 4.5 && venue.totalRatings > 100) return '⭐ Highly rated spot';
-            if (venue.openNow) return '🟢 Open right now';
-            if (venue.priceLevel && venue.priceLevel <= 2) return '💰 Easy on the wallet';
+            if (index === 0) return 'Great place to start';
+            if (index === venues.length - 1) return 'Perfect final stop';
+            if (venue.rating >= 4.5 && venue.totalRatings > 100) return 'Highly rated spot';
+            if (venue.openNow) return 'Open right now';
+            if (venue.priceLevel && venue.priceLevel <= 2) return 'Easy on the wallet';
             if (route && route.legs[index - 1]) {
                 const dist = route.legs[index - 1].distance.value;
-                if (dist < 500) return '🚶 Just a short walk';
+                if (dist < 500) return 'Just a short walk';
             }
             return '';
         }
