@@ -3663,14 +3663,14 @@
 
                     const nextVenue = venues[i + 1];
                     const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=${v.lat}&pickup[longitude]=${v.lng}&dropoff[latitude]=${nextVenue.lat}&dropoff[longitude]=${nextVenue.lng}&dropoff[nickname]=${encodeURIComponent(nextVenue.name)}`;
-                    const careemUrl = `https://www.careem.com/`;
+                    const careemUrl = `https://www.google.com/maps/dir/?api=1&origin=${v.lat},${v.lng}&destination=${nextVenue.lat},${nextVenue.lng}&destination_place_id=${nextVenue.placeId || ''}&travelmode=driving`;
 
                     html += `
                         <div class="stop-walk">
                             <span class="stop-walk-info">${route.legs[i].duration.text} · ${route.legs[i].distance.text}</span>
                             <div class="ride-buttons">
                                 <a href="${uberUrl}" target="_blank" class="ride-btn uber">Uber</a>
-                                <a href="${careemUrl}" target="_blank" class="ride-btn careem">Careem</a>
+                                <a href="${careemUrl}" target="_blank" class="ride-btn careem">Directions</a>
                             </div>
                         </div>
                     `;
