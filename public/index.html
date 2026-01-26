@@ -2109,15 +2109,9 @@
 
         .presets-grid {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            overflow-x: auto;
             padding-bottom: 6px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .presets-grid::-webkit-scrollbar {
-            display: none;
         }
 
         .preset-btn {
@@ -2421,7 +2415,12 @@
         @media (max-width: 1024px) {
             .presets-grid {
                 flex-wrap: nowrap;
+                overflow-x: auto;
+                scrollbar-width: none;
                 -webkit-overflow-scrolling: touch;
+            }
+            .presets-grid::-webkit-scrollbar {
+                display: none;
             }
             .presets-section {
                 margin-bottom: 16px;
