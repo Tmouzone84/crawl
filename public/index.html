@@ -3985,6 +3985,11 @@
             document.getElementById('routeOverlay').classList.remove('visible');
             document.body.style.overflow = '';
 
+            // Always reset progress bar
+            currentStep = 0;
+            updateProgress(1);
+            currentStep = 1;
+
             if (resetSelections) {
                 // Clear selections
                 document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
@@ -3992,11 +3997,6 @@
                 selectedOptions = [];
                 subOptions.classList.remove('visible');
                 generateBtn.disabled = true;
-
-                // Reset progress
-                currentStep = 0;
-                updateProgress(1);
-                currentStep = 1;
 
                 // Clear markers and route from map
                 markers.forEach(m => m.remove());
