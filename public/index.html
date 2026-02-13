@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Crawl">
     <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.svg">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -480,11 +480,14 @@
         }
 
         .chip {
+            appearance: none;
             background: var(--bg-primary);
             border: 1px solid var(--border-subtle);
             border-radius: 20px;
             padding: 8px 16px;
             font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.2;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.3s ease;
@@ -2525,28 +2528,28 @@
             <!-- Vibe Selection -->
             <div class="section-title">What's the vibe?</div>
             <div class="vibe-grid" id="vibeGrid">
-                <div class="vibe-card" data-vibe="chill">
+                <div class="vibe-card" data-vibe="chill" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Chill Drinks</span>
                 </div>
-                <div class="vibe-card" data-vibe="party">
+                <div class="vibe-card" data-vibe="party" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Party Night</span>
                 </div>
-                <div class="vibe-card" data-vibe="day">
+                <div class="vibe-card" data-vibe="day" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Day Out</span>
                 </div>
-                <div class="vibe-card" data-vibe="date">
+                <div class="vibe-card" data-vibe="date" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Date Night</span>
                 </div>
-                <div class="vibe-card" data-vibe="group">
+                <div class="vibe-card" data-vibe="group" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Group Hangout</span>
                 </div>
-                <div class="vibe-card" data-vibe="brunch">
+                <div class="vibe-card" data-vibe="brunch" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Brunch</span>
                 </div>
-                <div class="vibe-card" data-vibe="ladies">
+                <div class="vibe-card" data-vibe="ladies" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Ladies Night</span>
                 </div>
-                <div class="vibe-card" data-vibe="explore">
+                <div class="vibe-card" data-vibe="explore" role="button" tabindex="0" aria-pressed="false">
                     <span class="vibe-name">Surprise Me</span>
                 </div>
             </div>
@@ -2561,9 +2564,9 @@
 
             <!-- Optional Preferences -->
             <div class="optional-section">
-                <div class="optional-header" id="optionalHeader">
+                <div class="optional-header" id="optionalHeader" role="button" tabindex="0" aria-expanded="false">
                     <span class="optional-title">More Options</span>
-                    <span class="optional-toggle" id="optionalToggle">▼</span>
+                    <span class="optional-toggle" id="optionalToggle">&#9662;</span>
                 </div>
                 <div class="optional-content" id="optionalContent">
                     <div class="day-picker-section">
@@ -2582,19 +2585,19 @@
 
                     <div class="toggle-row">
                         <span class="toggle-label">Budget-friendly</span>
-                        <div class="toggle-switch" id="toggleBudget"></div>
+                        <div class="toggle-switch" id="toggleBudget" role="switch" tabindex="0" aria-checked="false"></div>
                     </div>
                     <div class="toggle-row">
                         <span class="toggle-label">Late night (after midnight)</span>
-                        <div class="toggle-switch" id="toggleLateNight"></div>
+                        <div class="toggle-switch" id="toggleLateNight" role="switch" tabindex="0" aria-checked="false"></div>
                     </div>
                     <div class="toggle-row">
                         <span class="toggle-label">Live music / entertainment</span>
-                        <div class="toggle-switch" id="toggleLiveMusic"></div>
+                        <div class="toggle-switch" id="toggleLiveMusic" role="switch" tabindex="0" aria-checked="false"></div>
                     </div>
                     <div class="toggle-row">
                         <span class="toggle-label">Open now only</span>
-                        <div class="toggle-switch" id="toggleOpenNow"></div>
+                        <div class="toggle-switch" id="toggleOpenNow" role="switch" tabindex="0" aria-checked="false"></div>
                     </div>
 
                     <div class="slider-row">
@@ -2628,7 +2631,7 @@
         </aside>
 
         <!-- Route Overlay (tap to close on mobile) -->
-        <div class="route-overlay" id="routeOverlay"></div>
+        <div class="route-overlay" id="routeOverlay" aria-hidden="true"></div>
 
         <!-- Map -->
         <div class="map-container">
@@ -2670,25 +2673,25 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite" aria-busy="false">
         <div class="loader"></div>
         <div class="loading-text" id="loadingText">Planning your night...</div>
     </div>
 
     <!-- Error Toast -->
-    <div class="error-toast" id="errorToast"></div>
+    <div class="error-toast" id="errorToast" role="alert" aria-live="assertive"></div>
 
     <!-- Install Banner -->
     <div class="install-banner" id="installBanner">
         <span>Install Crawl for quick access</span>
         <div>
             <button class="install-btn" id="installBtn">Install</button>
-            <button class="install-dismiss" id="installDismiss">×</button>
+            <button class="install-dismiss" id="installDismiss">&times;</button>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <!-- Share Modal -->
     <div class="share-modal" id="shareModal">
@@ -2829,6 +2832,7 @@
         let selectedOptions = [];
         let userLocation = null;
         let deferredPrompt = null;
+        const appConfig = { mapboxToken: '' };
 
         // Preferences
         let prefBudget = false;
@@ -2884,7 +2888,7 @@
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         }
 
-        function init() {
+        async function init() {
             // Apply saved theme
             setTheme(currentTheme);
             themeToggle.addEventListener('click', toggleTheme);
@@ -2896,11 +2900,15 @@
             setupToggles();
             setupDayPicker();
             setupPresets();
+            setupAccessibility();
             setupPWA();
 
-            // Hardcoded Mapbox token
-            const MAPBOX_TOKEN = 'pk.eyJ1IjoicmVtbXlleTg0IiwiYSI6ImNta256OWJncjAweDUza3M5dWo4YWdpMG8ifQ.48fo_5zcZDWzk59ksbCw5w';
-            initMap(MAPBOX_TOKEN);
+            await loadAppConfig();
+            if (appConfig.mapboxToken) {
+                initMap(appConfig.mapboxToken);
+            } else {
+                showError('Map token not configured');
+            }
 
             generateBtn.addEventListener('click', generateCrawl);
             locationInput.addEventListener('input', checkGenerateButton);
@@ -2931,24 +2939,51 @@
             loadSharedCrawl();
         }
 
+        async function loadAppConfig() {
+            appConfig.mapboxToken = (mapboxTokenInput?.value || '').trim();
+            try {
+                const response = await fetch('/api/config');
+                if (!response.ok) return;
+                const data = await response.json();
+                if (typeof data.mapboxToken === 'string' && data.mapboxToken.trim()) {
+                    appConfig.mapboxToken = data.mapboxToken.trim();
+                }
+            } catch (_) {
+                // Keep local fallback value.
+            }
+        }
+
         // Vibe Selection
         function setupVibeSelection() {
-            vibeGrid.addEventListener('click', (e) => {
-                const card = e.target.closest('.vibe-card');
+            function selectVibeCard(card) {
                 if (!card) return;
 
-                // Deselect all
-                document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
+                document.querySelectorAll('.vibe-card').forEach(c => {
+                    c.classList.remove('selected');
+                    c.setAttribute('aria-pressed', 'false');
+                });
 
-                // Select this one
                 card.classList.add('selected');
+                card.setAttribute('aria-pressed', 'true');
                 selectedVibe = card.dataset.vibe;
                 selectedOptions = [];
 
-                // Show sub-options
                 showSubOptions(selectedVibe);
                 checkGenerateButton();
                 updateProgress(2);
+            }
+
+            vibeGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.vibe-card');
+                selectVibeCard(card);
+            });
+
+            vibeGrid.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const card = e.target.closest('.vibe-card');
+                if (!card) return;
+                e.preventDefault();
+                selectVibeCard(card);
             });
         }
 
@@ -2958,13 +2993,14 @@
 
             subOptionsTitle.textContent = config.title;
             subOptionsChips.innerHTML = config.options.map(opt =>
-                `<div class="chip" data-option="${opt.id}">${opt.label}</div>`
+                `<button type="button" class="chip" data-option="${opt.id}" aria-pressed="false">${opt.label}</button>`
             ).join('');
 
             // Add click handlers
             subOptionsChips.querySelectorAll('.chip').forEach(chip => {
                 chip.addEventListener('click', () => {
                     chip.classList.toggle('selected');
+                    chip.setAttribute('aria-pressed', chip.classList.contains('selected') ? 'true' : 'false');
                     const optionId = chip.dataset.option;
                     if (chip.classList.contains('selected')) {
                         selectedOptions.push(optionId);
@@ -2979,30 +3015,59 @@
 
         // Optional Section
         function setupOptionalSection() {
-            optionalHeader.addEventListener('click', () => {
+            function toggleOptionalSection() {
                 optionalContent.classList.toggle('visible');
                 optionalHeader.classList.toggle('expanded');
                 optionalToggle.classList.toggle('expanded');
+                optionalHeader.setAttribute('aria-expanded', optionalContent.classList.contains('visible') ? 'true' : 'false');
+            }
+
+            optionalHeader.addEventListener('click', () => {
+                toggleOptionalSection();
+            });
+
+            optionalHeader.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                e.preventDefault();
+                toggleOptionalSection();
             });
         }
 
         // Toggles
         function setupToggles() {
-            document.getElementById('toggleBudget').addEventListener('click', function() {
-                this.classList.toggle('active');
-                prefBudget = this.classList.contains('active');
-            });
-            document.getElementById('toggleLateNight').addEventListener('click', function() {
-                this.classList.toggle('active');
-                prefLateNight = this.classList.contains('active');
-            });
-            document.getElementById('toggleLiveMusic').addEventListener('click', function() {
-                this.classList.toggle('active');
-                prefLiveMusic = this.classList.contains('active');
-            });
-            document.getElementById('toggleOpenNow').addEventListener('click', function() {
-                this.classList.toggle('active');
-                prefOpenNow = this.classList.contains('active');
+            function bindToggle(id, assignPref) {
+                const el = document.getElementById(id);
+                const labelText = el.closest('.toggle-row')?.querySelector('.toggle-label')?.textContent?.trim();
+                if (labelText) el.setAttribute('aria-label', labelText);
+
+                const toggle = () => {
+                    el.classList.toggle('active');
+                    const isActive = el.classList.contains('active');
+                    el.setAttribute('aria-checked', isActive ? 'true' : 'false');
+                    assignPref(isActive);
+                };
+
+                el.addEventListener('click', toggle);
+                el.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    toggle();
+                });
+            }
+
+            bindToggle('toggleBudget', (val) => { prefBudget = val; });
+            bindToggle('toggleLateNight', (val) => { prefLateNight = val; });
+            bindToggle('toggleLiveMusic', (val) => { prefLiveMusic = val; });
+            bindToggle('toggleOpenNow', (val) => { prefOpenNow = val; });
+        }
+
+        function setupAccessibility() {
+            routeStops.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const stop = e.target.closest('.timeline-stop');
+                if (!stop) return;
+                e.preventDefault();
+                toggleTimelineStop(stop);
             });
         }
 
@@ -3048,7 +3113,9 @@
 
             // Reset toggles
             ['toggleBudget', 'toggleLateNight', 'toggleLiveMusic', 'toggleOpenNow'].forEach(id => {
-                document.getElementById(id).classList.remove('active');
+                const toggle = document.getElementById(id);
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-checked', 'false');
             });
             prefBudget = false;
             prefLateNight = false;
@@ -3067,6 +3134,7 @@
                     stopsSlider.value = 3;
                     stopsValue.textContent = '3';
                     document.getElementById('toggleOpenNow').classList.add('active');
+                    document.getElementById('toggleOpenNow').setAttribute('aria-checked', 'true');
                     prefOpenNow = true;
                     break;
                 case 'budget':
@@ -3074,6 +3142,7 @@
                     stopsSlider.value = 4;
                     stopsValue.textContent = '4';
                     document.getElementById('toggleBudget').classList.add('active');
+                    document.getElementById('toggleBudget').setAttribute('aria-checked', 'true');
                     prefBudget = true;
                     break;
                 case 'music':
@@ -3081,6 +3150,7 @@
                     stopsSlider.value = 3;
                     stopsValue.textContent = '3';
                     document.getElementById('toggleLiveMusic').classList.add('active');
+                    document.getElementById('toggleLiveMusic').setAttribute('aria-checked', 'true');
                     prefLiveMusic = true;
                     break;
                 case 'weekend':
@@ -3088,6 +3158,7 @@
                     stopsSlider.value = 4;
                     stopsValue.textContent = '4';
                     document.getElementById('toggleLateNight').classList.add('active');
+                    document.getElementById('toggleLateNight').setAttribute('aria-checked', 'true');
                     prefLateNight = true;
                     // Select Friday
                     document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
@@ -3101,6 +3172,7 @@
                 optionalContent.classList.add('visible');
                 optionalHeader.classList.add('expanded');
                 optionalToggle.classList.add('expanded');
+                optionalHeader.setAttribute('aria-expanded', 'true');
             }
 
             checkGenerateButton();
@@ -3108,10 +3180,14 @@
         }
 
         function selectVibeByName(vibeName) {
-            document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.vibe-card').forEach(c => {
+                c.classList.remove('selected');
+                c.setAttribute('aria-pressed', 'false');
+            });
             const card = document.querySelector(`.vibe-card[data-vibe="${vibeName}"]`);
             if (card) {
                 card.classList.add('selected');
+                card.setAttribute('aria-pressed', 'true');
                 selectedVibe = vibeName;
                 selectedOptions = [];
                 showSubOptions(vibeName);
@@ -3131,7 +3207,7 @@
                 s.classList.remove('active', 'completed');
                 if (stepNum < currentStep) {
                     s.classList.add('completed');
-                    s.querySelector('.progress-dot').textContent = '✓';
+                    s.querySelector('.progress-dot').textContent = '\u2713';
                 } else if (stepNum === currentStep) {
                     s.classList.add('active');
                 }
@@ -3160,7 +3236,7 @@
                                 lng: position.coords.longitude
                             };
                             locationInput.value = `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`;
-                            useLocationBtn.textContent = '✓';
+                            useLocationBtn.textContent = '\u2713';
                             if (map) {
                                 map.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 14 });
                             }
@@ -3311,6 +3387,7 @@
         async function generateCrawl() {
             updateProgress(3);
             loadingOverlay.classList.add('visible');
+            loadingOverlay.setAttribute('aria-busy', 'true');
             loadingText.textContent = 'Finding your location...';
 
             try {
@@ -3341,6 +3418,7 @@
                 showError(error.message);
             } finally {
                 loadingOverlay.classList.remove('visible');
+                loadingOverlay.setAttribute('aria-busy', 'false');
             }
         }
 
@@ -3353,6 +3431,7 @@
             if (!ids) return;
 
             loadingOverlay.classList.add('visible');
+            loadingOverlay.setAttribute('aria-busy', 'true');
             loadingText.textContent = 'Loading shared crawl...';
 
             try {
@@ -3391,6 +3470,7 @@
                 showError(error.message);
             } finally {
                 loadingOverlay.classList.remove('visible');
+                loadingOverlay.setAttribute('aria-busy', 'false');
             }
         }
 
@@ -3630,17 +3710,17 @@
                 const matchReason = getMatchReason(v, i, venues, route);
 
                 let html = `
-                    <div class="timeline-stop" data-index="${i}" onclick="toggleTimelineStop(this)">
+                    <div class="timeline-stop" data-index="${i}" onclick="toggleTimelineStop(this)" role="button" tabindex="0" aria-expanded="false">
                         <div class="timeline-header">
                             <span class="timeline-time">${arrivalTime}</span>
                             <span class="timeline-icon">${venueIcon}</span>
                             <span class="timeline-venue-name">${v.name}</span>
-                            <span class="timeline-expand-icon">▼</span>
+                            <span class="timeline-expand-icon">&#9662;</span>
                         </div>
                         <div class="timeline-details">
                             <div class="timeline-duration">Suggested stay: ${durationLabel}</div>
                             <div class="stop-meta">
-                                <span class="stop-rating">★ ${v.rating.toFixed(1)}</span>
+                                <span class="stop-rating">&#9733; ${v.rating.toFixed(1)}</span>
                                 <span>${v.totalRatings} reviews</span>
                             </div>
                             <div class="venue-badges">${badges}</div>
@@ -3666,11 +3746,11 @@
 
                     const nextVenue = venues[i + 1];
                     const uberUrl = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=${v.lat}&pickup[longitude]=${v.lng}&dropoff[latitude]=${nextVenue.lat}&dropoff[longitude]=${nextVenue.lng}&dropoff[nickname]=${encodeURIComponent(nextVenue.name)}`;
-                    const careemUrl = `https://www.google.com/maps/dir/?api=1&origin=${v.lat},${v.lng}&destination=${nextVenue.lat},${nextVenue.lng}&destination_place_id=${nextVenue.placeId || ''}&travelmode=driving`;
+                    const careemUrl = `https://www.google.com/maps/dir/?api=1&origin=${v.lat},${v.lng}&destination=${nextVenue.lat},${nextVenue.lng}&destination_place_id=${nextVenue.id || ''}&travelmode=driving`;
 
                     html += `
                         <div class="stop-walk">
-                            <span class="stop-walk-info">${route.legs[i].duration.text} · ${route.legs[i].distance.text}</span>
+                            <span class="stop-walk-info">${route.legs[i].duration.text} &middot; ${route.legs[i].distance.text}</span>
                             <div class="ride-buttons">
                                 <a href="${uberUrl}" target="_blank" class="ride-btn uber">Uber</a>
                                 <a href="${careemUrl}" target="_blank" class="ride-btn careem">Directions</a>
@@ -3683,12 +3763,14 @@
 
             routePanel.classList.add('visible');
             document.getElementById('routeOverlay').classList.add('visible');
+            document.getElementById('routeOverlay').setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
         }
 
         // Timeline helpers
         function toggleTimelineStop(el) {
             el.classList.toggle('expanded');
+            el.setAttribute('aria-expanded', el.classList.contains('expanded') ? 'true' : 'false');
         }
 
         function formatTime(date) {
@@ -3700,7 +3782,7 @@
         }
 
         function getVenueIcon(venue) {
-            return '•';
+            return '&bull;';
         }
 
         function getSuggestedDuration(venue) {
@@ -3956,20 +4038,27 @@
 
             savedCrawlsSection.classList.add('visible');
             savedCrawlsList.innerHTML = crawls.map(crawl => `
-                <div class="saved-crawl-item" data-id="${crawl.id}">
+                <div class="saved-crawl-item" data-id="${crawl.id}" role="button" tabindex="0">
                     <div class="saved-crawl-name">${crawl.name}</div>
-                    <div class="saved-crawl-meta">${crawl.venues.length} stops · ${crawl.date}</div>
+                    <div class="saved-crawl-meta">${crawl.venues.length} stops &middot; ${crawl.date}</div>
                 </div>
             `).join('');
 
             // Add click handlers
             savedCrawlsList.querySelectorAll('.saved-crawl-item').forEach(item => {
-                item.addEventListener('click', () => {
+                const openSaved = () => {
                     const id = parseInt(item.dataset.id);
                     const crawl = crawls.find(c => c.id === id);
                     if (crawl) {
                         displayRoute(crawl.venues, crawl.route);
                     }
+                };
+
+                item.addEventListener('click', openSaved);
+                item.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    openSaved();
                 });
             });
         }
@@ -3986,6 +4075,7 @@
         function closeRoutePanel(resetSelections = false) {
             routePanel.classList.remove('visible');
             document.getElementById('routeOverlay').classList.remove('visible');
+            document.getElementById('routeOverlay').setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
 
             // Always reset progress bar
@@ -3995,7 +4085,10 @@
 
             if (resetSelections) {
                 // Clear selections
-                document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('selected'));
+                document.querySelectorAll('.vibe-card').forEach(c => {
+                    c.classList.remove('selected');
+                    c.setAttribute('aria-pressed', 'false');
+                });
                 selectedVibe = null;
                 selectedOptions = [];
                 subOptions.classList.remove('visible');
@@ -4092,3 +4185,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
