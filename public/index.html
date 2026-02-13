@@ -3622,7 +3622,12 @@
 
             const bounds = new mapboxgl.LngLatBounds();
             venues.forEach(v => bounds.extend([v.lng, v.lat]));
-            map.fitBounds(bounds, { padding: 80 });
+            const isMobileLayout = window.matchMedia('(max-width: 1024px)').matches;
+            map.fitBounds(bounds, {
+                padding: isMobileLayout
+                    ? { top: 80, right: 80, bottom: 80, left: 80 }
+                    : { top: 80, right: 460, bottom: 80, left: 80 }
+            });
 
             // Calculate average price level
             const avgPriceLevel = Math.round(venues.reduce((sum, v) => sum + (v.priceLevel || 3), 0) / venues.length);
