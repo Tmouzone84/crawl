@@ -6,44 +6,17 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN || '';
 
-const allowedCorsOrigins = (process.env.CORS_ORIGINS || '')
-    .split(',')
-    .map(origin => origin.trim())
-    .filter(Boolean);
-
-app.use(cors({
-    origin: (origin, callback) => {
-        // Non-browser clients may not send Origin.
-        if (!origin) return callback(null, true);
-        if (allowedCorsOrigins.length === 0 || allowedCorsOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-        return callback(new Error('Not allowed by CORS'));
-    }
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-
-function parseLatLng(value) {
-    if (!value || typeof value !== 'string') return null;
-    const [lat, lng] = value.split(',').map(Number);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-    return { lat, lng };
-}
 
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
-        hasApiKey: !!GOOGLE_API_KEY
-    });
-});
-
-app.get('/api/config', (req, res) => {
-    res.json({
-        mapboxToken: MAPBOX_TOKEN
+        hasApiKey: !!GOOGLE_API_KEY,
+        keyPreview: GOOGLE_API_KEY ? GOOGLE_API_KEY.substring(0, 8) + '...' : 'NOT SET'
     });
 });
 
@@ -54,16 +27,9 @@ app.get('/api/geocode', async (req, res) => {
     }
     try {
         const { address } = req.query;
-        if (!address || typeof address !== 'string' || !address.trim()) {
-            return res.status(400).json({ error: 'address is required' });
-        }
-
         const response = await fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`
         );
-        if (!response.ok) {
-            return res.status(502).json({ error: `Geocode API failed with status ${response.status}` });
-        }
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -78,13 +44,6 @@ app.get('/api/places/nearby', async (req, res) => {
     }
     try {
         const { lat, lng, radius, keyword } = req.query;
-        const latitude = Number.parseFloat(lat);
-        const longitude = Number.parseFloat(lng);
-        const searchRadius = Number.parseFloat(radius);
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-            return res.status(400).json({ error: 'lat and lng must be valid numbers' });
-        }
-
         const textQuery = keyword || 'bar lounge nightclub';
 
         const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
@@ -99,15 +58,12 @@ app.get('/api/places/nearby', async (req, res) => {
                 maxResultCount: 20,
                 locationBias: {
                     circle: {
-                        center: { latitude, longitude },
-                        radius: Number.isFinite(searchRadius) && searchRadius > 0 ? searchRadius : 5000.0
+                        center: { latitude: parseFloat(lat), longitude: parseFloat(lng) },
+                        radius: parseFloat(radius) || 5000.0
                     }
                 }
             })
         });
-        if (!response.ok) {
-            return res.status(502).json({ error: `Places API failed with status ${response.status}` });
-        }
 
         const data = await response.json();
 
@@ -157,15 +113,7 @@ app.get('/api/places/details', async (req, res) => {
         const { ids } = req.query;
         if (!ids) return res.status(400).json({ error: 'Missing ids parameter' });
 
-        const placeIds = ids
-            .split(',')
-            .map(id => id.trim())
-            .filter(Boolean)
-            .slice(0, 10); // Limit to 10 venues
-        if (!placeIds.length) {
-            return res.status(400).json({ error: 'No valid ids provided' });
-        }
-
+        const placeIds = ids.split(',').slice(0, 10); // Limit to 10 venues
         const results = await Promise.all(placeIds.map(async (placeId) => {
             const response = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
                 headers: {
@@ -174,7 +122,6 @@ app.get('/api/places/details', async (req, res) => {
                     'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,rating,userRatingCount,priceLevel,currentOpeningHours,types,primaryType,internationalPhoneNumber,websiteUri,googleMapsUri'
                 }
             });
-            if (!response.ok) return null;
             const place = await response.json();
             if (place.error) return null;
             return {
@@ -206,29 +153,20 @@ app.get('/api/directions', async (req, res) => {
     }
     try {
         const { origin, destination, waypoints } = req.query;
-        const parsedOrigin = parseLatLng(origin);
-        const parsedDestination = parseLatLng(destination);
-        if (!parsedOrigin || !parsedDestination) {
-            return res.status(400).json({ error: 'origin and destination must be "lat,lng"' });
-        }
+        const [originLat, originLng] = origin.split(',').map(Number);
+        const [destLat, destLng] = destination.split(',').map(Number);
 
         const requestBody = {
-            origin: { location: { latLng: { latitude: parsedOrigin.lat, longitude: parsedOrigin.lng } } },
-            destination: { location: { latLng: { latitude: parsedDestination.lat, longitude: parsedDestination.lng } } },
+            origin: { location: { latLng: { latitude: originLat, longitude: originLng } } },
+            destination: { location: { latLng: { latitude: destLat, longitude: destLng } } },
             travelMode: 'DRIVE'
         };
 
         if (waypoints) {
-            const parsedWaypoints = waypoints
-                .split('|')
-                .map(parseLatLng)
-                .filter(Boolean)
-                .slice(0, 8);
-            if (parsedWaypoints.length) {
-                requestBody.intermediates = parsedWaypoints.map(wp => ({
-                    location: { latLng: { latitude: wp.lat, longitude: wp.lng } }
-                }));
-            }
+            requestBody.intermediates = waypoints.split('|').map(wp => {
+                const [lat, lng] = wp.split(',').map(Number);
+                return { location: { latLng: { latitude: lat, longitude: lng } } };
+            });
         }
 
         const response = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
@@ -240,9 +178,6 @@ app.get('/api/directions', async (req, res) => {
             },
             body: JSON.stringify(requestBody)
         });
-        if (!response.ok) {
-            return res.status(502).json({ error: `Routes API failed with status ${response.status}` });
-        }
 
         const data = await response.json();
 

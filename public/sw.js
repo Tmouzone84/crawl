@@ -3,7 +3,7 @@ const urlsToCache = [
     '/',
     '/index.html',
     '/manifest.json',
-    '/icon-192.svg',
+    '/icon-192.png',
     'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap',
     'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css',
     'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'
